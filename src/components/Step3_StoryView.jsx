@@ -1,163 +1,276 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import confetti from 'canvas-confetti';
-import { generateStoryPage } from '../services/mockAiService';
+import { generateStoryTurn } from '../services/geminiService';
+import { Send, Sparkles, BookOpen, Star, User, Info } from 'lucide-react';
 
-export default function Step3_StoryView({ grade, theme, onFinish, onSave }) {
+const ImageWithLoading = ({ src, alt }) => {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <div style={{ position: 'relative', width: '100%', maxWidth: '400px', marginTop: '1rem', overflow: 'hidden', borderRadius: '12px', minHeight: '200px', background: '#f0f0f0' }}>
+      {!loaded && (
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ color: '#888', fontSize: '0.9rem' }}>🎨 AI가 그림을 그리는 중...</span>
+        </div>
+      )}
+      <img 
+        src={src} 
+        alt={alt} 
+        onLoad={() => setLoaded(true)}
+        style={{ width: '100%', display: 'block', opacity: loaded ? 1 : 0, transition: 'opacity 0.5s ease-in-out' }} 
+      />
+    </div>
+  );
+};
+
+export default function Step3_StoryView({ grade, theme, protagonist, onFinish, onSave }) {
+  const TOTAL_TURNS = 15;
   const [currentPage, setCurrentPage] = useState(1);
-  const [storyData, setStoryData] = useState([]);
+  const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentInput, setCurrentInput] = useState('');
   const [customInput, setCustomInput] = useState('');
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [currentOptions, setCurrentOptions] = useState([]);
+  const [storyData, setStoryData] = useState([]);
 
-  const loadPage = async (page, input = '') => {
-    setLoading(true);
-    const data = await generateStoryPage(page, theme, input, grade);
-    setStoryData(prev => {
-      const newData = [...prev];
-      newData[page - 1] = data;
-      return newData;
-    });
-    setLoading(false);
+  const chatEndRef = useRef(null);
 
-    if (page === 3) {
-      fireConfetti();
-    }
+  // 주인공 데이터 방어코드
+  const heroName = protagonist?.name || '주인공';
+  const heroType = protagonist?.type || '모험가';
+  
+  // 주인공 종류를 기반으로 맞춤형 귀여운 캐릭터 이미지를 실시간으로 생성해주는 무료 AI 이미지 생성기 사용
+  const avatarUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent('A cute kawaii ' + heroType + ' character, pastel colors, 2d flat vector art, white background')}?width=200&height=200&nologo=true`;
+
+  const scrollToBottom = () => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
-    loadPage(1);
+    scrollToBottom();
+  }, [messages, loading]);
+
+  const loadTurn = async (page, input = '') => {
+    setLoading(true);
+    setCurrentOptions([]);
+    
+    const data = await generateStoryTurn(page, theme, protagonist, input, grade);
+    
+    const turnData = {
+        storyText: data.storyText,
+        question: data.question,
+        options: data.options || [],
+        image: data.image || null,
+        isLastPage: data.isLastPage
+      };
+
+      setStoryData(prev => [...prev, turnData]);
+      
+      // options가 배열인지 확인
+      const currentOptions = Array.isArray(data.options) ? data.options : [];
+      
+      const botMessage = {
+        sender: 'ai',
+        text: `${data.storyText || ''} ${data.question || ''}`.trim(),
+        options: currentOptions,
+        image: data.image || null
+      };
+      
+      setMessages(prev => [...prev, botMessage]);
+      
+      setCurrentOptions(currentOptions);
+      setLoading(false);
+
+      if (data.isLastPage) {
+        setTimeout(() => {
+          setIsCompleted(true);
+          fireConfetti();
+        }, 2000);
+      }
+  };
+
+  const hasLoaded = useRef(false);
+  useEffect(() => {
+    if (!hasLoaded.current) {
+      loadTurn(1);
+      hasLoaded.current = true;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fireConfetti = () => {
     const duration = 3 * 1000;
-    const end = Date.now() + duration;
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
 
-    const frame = () => {
-      confetti({
-        particleCount: 5,
-        angle: 60,
-        spread: 55,
-        origin: { x: 0 },
-        colors: ['#ff922b', '#b2f2bb', '#ffc9c9']
-      });
-      confetti({
-        particleCount: 5,
-        angle: 120,
-        spread: 55,
-        origin: { x: 1 },
-        colors: ['#ff922b', '#b2f2bb', '#ffc9c9']
-      });
+    const randomInRange = (min, max) => Math.random() * (max - min) + min;
 
-      if (Date.now() < end) {
-        requestAnimationFrame(frame);
-      }
-    };
-    frame();
+    const interval = setInterval(function() {
+      const timeLeft = animationEnd - Date.now();
+      if (timeLeft <= 0) return clearInterval(interval);
+
+      const particleCount = 50 * (timeLeft / duration);
+      confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+      confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+    }, 250);
   };
 
-  const handleNextPage = (selectedOption) => {
-    setCurrentInput(selectedOption);
+  const handleUserResponse = (text) => {
+    if (!text.trim()) return;
+
+    setMessages(prev => [...prev, {
+      id: Date.now(),
+      sender: 'user',
+      text: text
+    }]);
+
+    setCurrentOptions([]);
+    setCustomInput('');
     setCurrentPage(prev => prev + 1);
-    loadPage(currentPage + 1, selectedOption);
+    
+    loadTurn(currentPage + 1, text);
   };
 
-  const handleCustomInputSubmit = (e) => {
-    e.preventDefault();
-    if (customInput.trim()) {
-      handleNextPage(customInput);
-      setCustomInput('');
-    }
-  };
-
-  if (loading && !storyData[currentPage - 1]) {
+  if (isCompleted) {
+    const finalImage = storyData.find(d => d.isLastPage)?.image || storyData[0]?.image;
+    
     return (
-      <div className="container" style={{ justifyContent: 'center', alignItems: 'center' }}>
-        <h2 className="title animate-pulse-soft">AI가 이야기를 만들고 있어요... ✨</h2>
+      <div className="container animate-fade-in" style={{ justifyContent: 'center', alignItems: 'center', textAlign: 'center', maxWidth: '800px' }}>
+        <div style={{ background: 'rgba(255,255,255,0.95)', padding: '4rem 2rem', borderRadius: '32px', boxShadow: '0 20px 50px rgba(0,0,0,0.1)', width: '100%' }}>
+          <Sparkles size={64} color="#f5a623" className="animate-fade-in" style={{ marginBottom: '1rem', animationDuration: '2s', animationIterationCount: 'infinite' }} />
+          <h1 className="title" style={{ fontSize: '4rem', marginBottom: '1rem', color: '#f5a623', textShadow: '2px 2px 0px rgba(255,255,255,1)' }}>🎉 완성 축하! 🎉</h1>
+          <p className="subtitle" style={{ fontSize: '1.6rem', marginBottom: '3rem', color: '#333' }}>
+            짝짝짝! 드디어 15단계의 기나긴 모험을 마쳤어요!<br/>나만의 멋진 '{theme}' 동화가 탄생했습니다.
+          </p>
+          
+          {finalImage && (
+            <div style={{ padding: '10px', background: 'white', borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', marginBottom: '3rem', display: 'inline-block' }}>
+              <img src={finalImage} alt="결말 이미지" style={{ width: '100%', maxWidth: '500px', borderRadius: '16px' }} />
+            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center' }}>
+            <button className="btn btn-primary" style={{ padding: '1.2rem 3rem', fontSize: '1.5rem', borderRadius: '30px' }} onClick={() => onSave({ theme, pages: storyData })}>
+              <BookOpen size={24} style={{ marginRight: '8px' }} />
+              보관함에 자랑하기 💾
+            </button>
+            <button className="btn" style={{ padding: '1.2rem 3rem', fontSize: '1.5rem', borderRadius: '30px', border: '2px solid #eaeaea' }} onClick={onFinish}>
+              새로운 모험 떠나기 🚀
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
 
-  const currentContent = storyData[currentPage - 1];
-
   return (
-    <div className="container animate-fade-in" style={{ padding: '1rem' }}>
-      <div className="book-container">
-        <div className="book-page book-left">
-          {loading ? (
-            <div className="animate-pulse-soft" style={{ width: '100%', height: '300px', backgroundColor: '#e9ecef', borderRadius: '16px' }} />
-          ) : (
-            <img src={currentContent.image} alt="Story illustration" className="story-image animate-fade-in" />
-          )}
-        </div>
+    <div className="container animate-fade-in" style={{ padding: '1rem', maxWidth: '1200px' }}>
+      
+      <div style={{ display: 'flex', gap: '2rem', height: '80vh' }}>
         
-        <div className="book-page book-right">
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <h3 className="heading-font" style={{ fontSize: '1.5rem', color: '#adb5bd', marginBottom: '1rem' }}>
-              - {currentPage} 페이지 -
-            </h3>
-            
-            {loading ? (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <div className="animate-pulse-soft" style={{ width: '100%', height: '20px', backgroundColor: '#e9ecef', borderRadius: '4px' }} />
-                <div className="animate-pulse-soft" style={{ width: '90%', height: '20px', backgroundColor: '#e9ecef', borderRadius: '4px' }} />
-                <div className="animate-pulse-soft" style={{ width: '95%', height: '20px', backgroundColor: '#e9ecef', borderRadius: '4px' }} />
-              </div>
-            ) : (
-              <p className="story-text animate-fade-in" style={{ fontSize: grade === 'low' ? 'var(--text-size-low)' : 'var(--text-size-high)' }}>
-                {currentContent.text}
-              </p>
-            )}
+        {/* Left Side: Chatbot UI */}
+        <div style={{ flex: 2, display: 'flex', flexDirection: 'column' }}>
+          <div className="chat-container" style={{ height: '100%', maxWidth: '100%' }}>
+            <div className="chat-history">
+              {messages.map(msg => (
+                <div key={msg.id} className={`chat-bubble-wrapper ${msg.sender}`}>
+                  <div className="chat-avatar" style={{ overflow: 'hidden' }}>
+                    {msg.sender === 'ai' ? '🤖' : <img src={avatarUrl} alt="주인공" style={{ width: '100%', height: '100%' }} />}
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <div className={`chat-bubble ${msg.sender}`} style={{ fontSize: grade === 'low' ? 'var(--text-size-low)' : 'var(--text-size-high)' }}>
+                      {msg.text}
+                    </div>
+                    {msg.image && (
+                      <img src={msg.image} alt="Story illustration" className="chat-image" />
+                    )}
+                  </div>
+                </div>
+              ))}
+              
+              {loading && (
+                <div className="chat-bubble-wrapper ai">
+                  <div className="chat-avatar">🤖</div>
+                  <div className="chat-bubble ai" style={{ display: 'flex', gap: '5px', alignItems: 'center', padding: '1.5rem' }}>
+                    <span className="animate-pulse" style={{ width: '8px', height: '8px', background: '#94a3b8', borderRadius: '50%' }}></span>
+                    <span className="animate-pulse" style={{ width: '8px', height: '8px', background: '#94a3b8', borderRadius: '50%', animationDelay: '0.2s' }}></span>
+                    <span className="animate-pulse" style={{ width: '8px', height: '8px', background: '#94a3b8', borderRadius: '50%', animationDelay: '0.4s' }}></span>
+                  </div>
+                </div>
+              )}
+              <div ref={chatEndRef} />
+            </div>
 
-            {!loading && currentPage < 3 && (
-              <div style={{ marginTop: 'auto', borderTop: '2px dashed #f1f3f5', paddingTop: '1.5rem' }}>
-                <p className="heading-font" style={{ fontSize: '1.5rem', marginBottom: '1rem', color: '#ff922b' }}>
-                  주인공은 다음으로 무엇을 할까요?
-                </p>
-                
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', marginBottom: '1rem' }}>
-                  {currentContent.options.map((opt, idx) => (
+            {!loading && !isCompleted && currentOptions.length > 0 && (
+              <div className="chat-input-area">
+                <div className="chat-options">
+                  {currentOptions.map((opt, idx) => (
                     <button 
                       key={idx} 
-                      className="btn" 
-                      style={{ background: '#f8f9fa', border: '2px solid #dee2e6', textAlign: 'left', padding: '1rem', fontSize: '1.2rem', justifyContent: 'flex-start' }}
-                      onClick={() => handleNextPage(opt)}
+                      className="chat-option-btn"
+                      onClick={() => handleUserResponse(opt)}
                     >
-                      {idx + 1}. {opt}
+                      {opt}
                     </button>
                   ))}
                 </div>
-
-                <form onSubmit={handleCustomInputSubmit} style={{ display: 'flex', gap: '0.5rem' }}>
+                
+                <form onSubmit={(e) => { e.preventDefault(); handleUserResponse(customInput); }} style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
                   <input
                     type="text"
                     className="input-field"
-                    placeholder="직접 행동을 적어주세요!"
+                    placeholder="또는 원하는 행동을 직접 적어주세요!"
                     value={customInput}
                     onChange={(e) => setCustomInput(e.target.value)}
-                    style={{ flex: 1, fontSize: '1rem', padding: '0.8rem' }}
+                    style={{ background: '#f8f9fa' }}
                   />
-                  <button type="submit" className="btn btn-primary" style={{ fontSize: '1rem', padding: '0.8rem 1.5rem' }} disabled={!customInput.trim()}>
-                    확인
+                  <button type="submit" className="btn btn-primary" style={{ borderRadius: 'var(--radius-full)', padding: '0 1.5rem' }} disabled={!customInput.trim()}>
+                    <Send size={20} />
                   </button>
                 </form>
               </div>
             )}
-
-            {!loading && currentPage === 3 && (
-              <div style={{ marginTop: 'auto', textAlign: 'center', paddingTop: '2rem' }}>
-                <h2 className="title" style={{ fontSize: '2.5rem', marginBottom: '1.5rem' }}>참 잘했어요! 🎉</h2>
-                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                  <button className="btn btn-primary" onClick={() => onSave({ theme, pages: storyData })}>
-                    보관함에 저장하기
-                  </button>
-                  <button className="btn btn-secondary" onClick={onFinish}>
-                    처음으로 돌아가기
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
         </div>
+
+        {/* Right Side: Dashboard Panel */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          
+          {/* Progress Card */}
+          <div style={{ background: 'rgba(255,255,255,0.95)', padding: '2rem', borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <span style={{ fontWeight: 'bold', color: 'var(--text-light)', fontSize: '1.2rem' }}>진행도</span>
+              <span style={{ fontWeight: 'bold', color: 'var(--primary-color)', fontSize: '1.5rem' }}>{currentPage} / {TOTAL_TURNS}</span>
+            </div>
+            <div className="progress-bar-container" style={{ margin: 0, height: '12px' }}>
+              <div className="progress-bar-fill" style={{ width: `${(currentPage / TOTAL_TURNS) * 100}%` }} />
+            </div>
+          </div>
+
+          {/* Character Card */}
+          <div style={{ background: 'rgba(255,255,255,0.95)', padding: '2rem', borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <h3 className="heading-font" style={{ fontSize: '1.8rem', color: '#333', marginBottom: '1.5rem', alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <User color="var(--primary-color)" /> 내 캐릭터
+            </h3>
+            
+            <div style={{ width: '180px', height: '180px', borderRadius: '50%', overflow: 'hidden', border: '4px solid white', boxShadow: '0 10px 20px rgba(0,0,0,0.1)', marginBottom: '1.5rem' }}>
+              <img src={avatarUrl} alt="주인공 프로필" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </div>
+
+            <div style={{ textAlign: 'center', width: '100%' }}>
+              <h2 className="heading-font" style={{ fontSize: '2.5rem', color: 'var(--primary-color)', margin: 0 }}>{heroName}</h2>
+              <p style={{ fontSize: '1.3rem', color: 'var(--text-light)', marginTop: '0.5rem', fontWeight: 'bold' }}>{heroType}</p>
+            </div>
+
+            <div style={{ marginTop: 'auto', width: '100%', background: '#f8f9fa', padding: '1.5rem', borderRadius: '16px', border: '1px solid #eaeaea' }}>
+              <h4 className="heading-font" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.3rem', color: '#555', marginBottom: '0.8rem' }}>
+                <Star color="#f5a623" size={20} /> 이번 이야기 주제
+              </h4>
+              <p style={{ fontSize: '1.1rem', color: 'var(--text-main)', lineHeight: 1.4 }}>{theme}</p>
+            </div>
+          </div>
+
+        </div>
+
       </div>
     </div>
   );

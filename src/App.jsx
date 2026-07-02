@@ -13,6 +13,7 @@ function App() {
   const [step, setStep] = useState(0); // 0: Auth, 1: Grade, 2: Theme, 3: Story, 4: Library
   const [grade, setGrade] = useState('');
   const [theme, setTheme] = useState('');
+  const [protagonist, setProtagonist] = useState(null);
 
   useEffect(() => {
     // Check active session
@@ -67,10 +68,10 @@ function App() {
 
   return (
     <>
-      <header style={{ background: 'white', padding: '1rem 2rem', boxShadow: 'var(--shadow-sm)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }} onClick={() => user ? setStep(1) : setStep(0)}>
-          <BookOpen color="#ff922b" size={32} />
-          <h1 className="heading-font" style={{ margin: 0, fontSize: '1.8rem', color: '#ff922b' }}>인터랙티브 동화 제작소</h1>
+      <header style={{ background: 'white', padding: '1rem 2rem', borderBottom: '1px solid #eaeaea', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(8px)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer' }} onClick={() => user ? setStep(1) : setStep(0)}>
+          <img src="/icon.png" alt="App Icon" style={{ width: '40px', height: '40px', borderRadius: '8px' }} />
+          <h1 className="heading-font" style={{ margin: 0, fontSize: '1.8rem', color: 'var(--text-main)' }}>AI 동화 메이커</h1>
         </div>
         {user && (
           <div style={{ display: 'flex', gap: '1rem' }}>
@@ -87,8 +88,29 @@ function App() {
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative' }}>
         {step === 0 && <Auth onLogin={handleLogin} />}
         {step === 1 && <Step1_GradeSelect onSelect={(selectedGrade) => { setGrade(selectedGrade); setStep(2); }} />}
-        {step === 2 && <Step2_ThemeSelect grade={grade} onSelect={(selectedTheme) => { setTheme(selectedTheme); setStep(3); }} />}
-        {step === 3 && <Step3_StoryView grade={grade} theme={theme} onFinish={() => setStep(1)} onSave={saveStoryToSupabase} />}
+        {step === 2 && (
+          <Step2_ThemeSelect grade={grade} onSelect={(data) => { 
+            if(typeof data === 'string') {
+              // Fallback for previous code
+              setTheme(data); 
+              setProtagonist({ name: '주인공', type: '어린이' });
+            } else {
+              setTheme(data.theme); 
+              setProtagonist(data.protagonist);
+            }
+            setStep(3); 
+          }} />
+        )}
+        
+        {step === 3 && (
+          <Step3_StoryView 
+            grade={grade} 
+            theme={theme} 
+            protagonist={protagonist}
+            onFinish={() => setStep(1)} 
+            onSave={saveStoryToSupabase}
+          />
+        )}
         {step === 4 && <Library user={user} onBack={() => setStep(1)} />}
       </main>
     </>
