@@ -21,6 +21,29 @@ const ImageWithLoading = ({ src, alt }) => {
   );
 };
 
+const CardImageWithLoading = ({ src, alt }) => {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '200px', background: '#f8f9fa', overflow: 'hidden' }}>
+      {!loaded && (
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.8rem' }}>
+          <div style={{ width: '30px', height: '30px', border: '3px solid #ffe3e3', borderTop: '3px solid #ff6b6b', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+          <span style={{ color: '#888', fontSize: '0.9rem', fontWeight: 'bold' }}>🎨 이미지 생성중...</span>
+        </div>
+      )}
+      <img 
+        src={src} 
+        alt={alt} 
+        onLoad={() => setLoaded(true)}
+        style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: loaded ? 1 : 0, transition: 'opacity 0.5s ease-in-out' }} 
+      />
+      <style>{`
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+      `}</style>
+    </div>
+  );
+};
+
 const MOCK_STORIES = [
   {
     id: 'mock1',
@@ -312,7 +335,7 @@ export default function Library({ user, onBack, guestStories = [], setGuestStori
               onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.06)' }}
               >
                 <div style={{ position: 'relative' }}>
-                  <img src={coverImage} alt="Cover" style={{ width: '100%', height: '200px', objectFit: 'cover' }} />
+                  <CardImageWithLoading src={coverImage} alt="Cover" />
                   <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transition: 'opacity 0.3s' }}
                     onMouseEnter={(e) => e.currentTarget.style.opacity = 1}
                     onMouseLeave={(e) => e.currentTarget.style.opacity = 0}
