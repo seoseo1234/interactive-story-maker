@@ -44,47 +44,47 @@ export default function Step0_5_EthicsGate({ onAgree }) {
   const [isChecked, setIsChecked] = useState(false);
 
   return (
-    <div className="container animate-fade-in" style={{ maxWidth: '1000px' }}>
-      <div style={{ background: 'rgba(255,255,255,0.95)', padding: '3rem', borderRadius: '32px', boxShadow: 'var(--shadow-lg)' }}>
+    <div className="container animate-fade-in" style={{ maxWidth: '1100px', padding: '1rem' }}>
+      <div style={{ background: 'rgba(255,255,255,0.95)', padding: '2rem', borderRadius: '32px', boxShadow: 'var(--shadow-lg)' }}>
         
-        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-          <ShieldCheck size={64} color="var(--primary-color)" style={{ marginBottom: '1rem' }} />
-          <h1 className="title" style={{ fontSize: '2.8rem', color: 'var(--primary-color)' }}>AI 동화 메이커 윤리 핵심 가이드</h1>
-          <p className="subtitle" style={{ fontSize: '1.3rem', color: '#555' }}>
+        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+          <ShieldCheck size={48} color="var(--primary-color)" style={{ marginBottom: '0.5rem' }} />
+          <h1 className="title" style={{ fontSize: '2.2rem', color: 'var(--primary-color)', margin: '0 0 0.5rem 0' }}>AI 동화 메이커 윤리 핵심 가이드</h1>
+          <p className="subtitle" style={{ fontSize: '1.1rem', color: '#555', margin: 0 }}>
             우리가 AI와 함께 멋진 동화를 만들기 위해 꼭 지켜야 할 약속들이에요.<br/>
             시작하기 전에 아래 6가지 가이드를 꼼꼼히 읽어주세요!
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginBottom: '3rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
           {guides.map((guide, idx) => (
-            <div key={idx} style={{ background: '#f8f9fa', padding: '2rem', borderRadius: '24px', border: '1px solid #eaeaea', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div style={{ background: 'white', padding: '0.8rem', borderRadius: '16px', boxShadow: 'var(--shadow-sm)' }}>
-                  {guide.icon}
+            <div key={idx} style={{ background: '#f8f9fa', padding: '1.2rem', borderRadius: '20px', border: '1px solid #eaeaea', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                <div style={{ background: 'white', padding: '0.5rem', borderRadius: '12px', boxShadow: 'var(--shadow-sm)' }}>
+                  {React.cloneElement(guide.icon, { size: 24 })}
                 </div>
-                <h2 className="heading-font" style={{ fontSize: '1.5rem', color: '#333', margin: 0 }}>{guide.title}</h2>
+                <h2 className="heading-font" style={{ fontSize: '1.3rem', color: '#333', margin: 0 }}>{guide.title}</h2>
               </div>
-              <h3 style={{ fontSize: '1.1rem', color: 'var(--primary-color)', lineHeight: 1.4, margin: '0.5rem 0' }}>{guide.subtitle}</h3>
-              <p style={{ fontSize: '1rem', color: '#666', lineHeight: 1.6 }}>{guide.desc}</p>
+              <h3 style={{ fontSize: '1rem', color: 'var(--primary-color)', lineHeight: 1.3, margin: '0.2rem 0' }}>{guide.subtitle}</h3>
+              <p style={{ fontSize: '0.9rem', color: '#666', lineHeight: 1.4, margin: 0 }}>{guide.desc}</p>
             </div>
           ))}
         </div>
 
-        <div style={{ background: '#f0f7ff', padding: '2rem', borderRadius: '20px', border: '2px solid #cce4ff', textAlign: 'center' }}>
-          <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', cursor: 'pointer', fontSize: '1.4rem', fontWeight: 'bold', color: '#333' }}>
+        <div style={{ background: '#f0f7ff', padding: '1.5rem', borderRadius: '20px', border: '2px solid #cce4ff', textAlign: 'center' }}>
+          <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.8rem', cursor: 'pointer', fontSize: '1.2rem', fontWeight: 'bold', color: '#333' }}>
             <input 
               type="checkbox" 
               checked={isChecked} 
               onChange={(e) => setIsChecked(e.target.checked)}
-              style={{ width: '24px', height: '24px', cursor: 'pointer' }}
+              style={{ width: '20px', height: '20px', cursor: 'pointer' }}
             />
             나는 윤리 핵심가이드를 빠짐없이 읽고 이를 실천하겠습니다.
           </label>
           
           <button 
             className="btn btn-primary" 
-            style={{ marginTop: '2rem', fontSize: '1.5rem', padding: '1.2rem 3rem', borderRadius: '30px', opacity: isChecked ? 1 : 0.5, cursor: isChecked ? 'pointer' : 'not-allowed' }}
+            style={{ marginTop: '1.5rem', fontSize: '1.3rem', padding: '1rem 2.5rem', borderRadius: '30px', opacity: isChecked ? 1 : 0.5, cursor: isChecked ? 'pointer' : 'not-allowed' }}
             disabled={!isChecked}
             onClick={onAgree}
           >
