@@ -2,7 +2,7 @@ export const generateStoryPage = async (pageNumber, theme, previousInput = '', g
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 1500));
 
-  const totalTurns = 15;
+  const totalTurns = grade === 'low' ? 10 : 15;
   let text = '';
   let options = [];
   let image = null;
@@ -12,11 +12,11 @@ export const generateStoryPage = async (pageNumber, theme, previousInput = '', g
     image = 'https://images.unsplash.com/photo-1514068574489-503a8eb91592?auto=format&fit=crop&w=800&q=80';
     text = `"${theme}" 세계로 모험을 시작합니다! 어느 날 주인공은 우연히 이상한 빛을 뿜는 문을 발견했어요. 문 너머에서는 누군가 도움을 청하는 목소리가 들립니다.`;
     options = ['용기를 내어 문을 열어본다.', '친구를 먼저 부르러 간다.'];
-  } else if (pageNumber === 8) {
+  } else if (pageNumber === Math.floor(totalTurns / 2)) {
     image = 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80';
     text = `[${previousInput}] 행동을 했더니, 거대한 숲 한가운데 도착했어요. 해가 지고 주변이 어두워지기 시작합니다. 멀리서 바스락거리는 소리가 들리네요!`;
     options = ['소리가 나는 곳으로 조심스럽게 다가간다.', '가방에서 손전등을 꺼내 비춰본다.'];
-  } else if (pageNumber === 15) {
+  } else if (pageNumber === totalTurns) {
     image = 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80';
     text = `마침내 주인공은 [${previousInput}]의 결정 덕분에 무사히 목적지에 도착했어요! 어려운 순간도 있었지만, 스스로의 힘으로 멋지게 문제를 해결했답니다. 이 모험은 오랫동안 주인공의 마음속에 행복한 기억으로 남을 거예요.`;
     options = [];

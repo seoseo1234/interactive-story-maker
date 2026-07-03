@@ -5,25 +5,32 @@ import { Send, Sparkles, BookOpen, Star, User, Info } from 'lucide-react';
 
 const ImageWithLoading = ({ src, alt }) => {
   const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState(false);
   return (
     <div style={{ position: 'relative', width: '100%', maxWidth: '400px', marginTop: '1rem', overflow: 'hidden', borderRadius: '12px', minHeight: '200px', background: '#f0f0f0' }}>
-      {!loaded && (
+      {!loaded && !error && (
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <span style={{ color: '#888', fontSize: '0.9rem' }}>🎨 AI가 그림을 그리는 중...</span>
+        </div>
+      )}
+      {error && (
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ color: '#888', fontSize: '0.9rem' }}>앗, 그림을 불러오지 못했어요 😢</span>
         </div>
       )}
       <img 
         src={src} 
         alt={alt} 
         onLoad={() => setLoaded(true)}
-        style={{ width: '100%', display: 'block', opacity: loaded ? 1 : 0, transition: 'opacity 0.5s ease-in-out' }} 
+        onError={() => { setLoaded(true); setError(true); }}
+        style={{ width: '100%', display: error ? 'none' : 'block', opacity: loaded ? 1 : 0, transition: 'opacity 0.5s ease-in-out' }} 
       />
     </div>
   );
 };
 
 export default function Step3_StoryView({ grade, theme, protagonist, onFinish, onSave }) {
-  const TOTAL_TURNS = 15;
+  const TOTAL_TURNS = grade === 'low' ? 10 : 15;
   const [currentPage, setCurrentPage] = useState(1);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -31,6 +38,10 @@ export default function Step3_StoryView({ grade, theme, protagonist, onFinish, o
   const [isCompleted, setIsCompleted] = useState(false);
   const [currentOptions, setCurrentOptions] = useState([]);
   const [storyData, setStoryData] = useState([]);
+  const [isLocked, setIsLocked] = useState(false);
+  const [unlockCode, setUnlockCode] = useState('');
+  
+  const BAD_WORDS = ['바보', '멍청이', '씨발', '개새끼', '나쁜말', '병신', '지랄', '존나', '새끼', '미친', '죽어'];
 
   const chatEndRef = useRef(null);
 
@@ -122,6 +133,11 @@ export default function Step3_StoryView({ grade, theme, protagonist, onFinish, o
   const handleUserResponse = (text) => {
     if (!text.trim()) return;
 
+    if (BAD_WORDS.some(word => text.includes(word))) {
+      setIsLocked(true);
+      return;
+    }
+
     setMessages(prev => [...prev, {
       id: Date.now(),
       sender: 'user',
@@ -134,6 +150,45 @@ export default function Step3_StoryView({ grade, theme, protagonist, onFinish, o
     
     loadTurn(currentPage + 1, text);
   };
+
+  if (isLocked) {
+    return (
+      <div className="container animate-fade-in" style={{ justifyContent: 'center', alignItems: 'center', textAlign: 'center', maxWidth: '800px', minHeight: '85vh' }}>
+        <div style={{ background: 'rgba(255,255,255,0.95)', padding: '4rem 2rem', borderRadius: '32px', boxShadow: '0 20px 50px rgba(0,0,0,0.1)', width: '100%' }}>
+          <h1 className="title" style={{ fontSize: '3rem', marginBottom: '1rem', color: '#ff6b6b' }}>🚨 잠깐만요! 🚨</h1>
+          <p className="subtitle" style={{ fontSize: '1.5rem', marginBottom: '3rem', color: '#333' }}>
+            나쁜 말이 감지되어 대화창이 잠겼습니다.<br/>
+            고운 말을 사용해주세요. 선생님이나 부모님의 확인이 필요합니다.
+          </p>
+          <div style={{ maxWidth: '300px', margin: '0 auto' }}>
+            <input 
+              type="password" 
+              className="input-field" 
+              placeholder="관리자 코드" 
+              value={unlockCode} 
+              onChange={(e) => setUnlockCode(e.target.value)} 
+              style={{ textAlign: 'center', fontSize: '1.5rem', marginBottom: '1rem' }}
+            />
+            <button 
+              className="btn btn-primary" 
+              style={{ width: '100%', fontSize: '1.2rem', padding: '1rem' }}
+              onClick={() => {
+                if (unlockCode === '1357') {
+                  setIsLocked(false);
+                  setUnlockCode('');
+                  setCustomInput('');
+                } else {
+                  alert('코드가 틀렸습니다.');
+                }
+              }}
+            >
+              잠금 해제
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (isCompleted) {
     const finalImage = storyData.find(d => d.isLastPage)?.image || storyData[0]?.image;
@@ -168,13 +223,13 @@ export default function Step3_StoryView({ grade, theme, protagonist, onFinish, o
   }
 
   return (
-    <div className="container animate-fade-in" style={{ padding: '1rem', maxWidth: '1200px' }}>
+    <div className="container animate-fade-in" style={{ padding: '1rem', maxWidth: '1400px' }}>
       
-      <div style={{ display: 'flex', gap: '2rem', height: '80vh' }}>
+      <div style={{ display: 'flex', gap: '2rem', height: '85vh' }}>
         
         {/* Left Side: Chatbot UI */}
-        <div style={{ flex: 2, display: 'flex', flexDirection: 'column' }}>
-          <div className="chat-container" style={{ height: '100%', maxWidth: '100%' }}>
+        <div style={{ flex: 2.5, display: 'flex', flexDirection: 'column' }}>
+          <div className="chat-container" style={{ flex: 1, maxWidth: '100%', height: 'auto' }}>
             <div className="chat-history">
               {messages.map(msg => (
                 <div key={msg.id} className={`chat-bubble-wrapper ${msg.sender}`}>
@@ -186,7 +241,7 @@ export default function Step3_StoryView({ grade, theme, protagonist, onFinish, o
                       {msg.text}
                     </div>
                     {msg.image && (
-                      <img src={msg.image} alt="Story illustration" className="chat-image" />
+                      <ImageWithLoading src={msg.image} alt="Story illustration" />
                     )}
                   </div>
                 </div>

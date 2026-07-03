@@ -59,6 +59,9 @@ export default function Auth({ onLogin }) {
           <button type="submit" className="btn btn-primary" disabled={loading}>
             {loading ? '처리 중...' : isLogin ? '시작하기' : '가입하기'}
           </button>
+          <button type="button" className="btn" style={{ background: '#f8f9fa', color: '#495057', border: '1px solid #eaeaea' }} onClick={() => onLogin({ id: 'guest', isGuest: true })}>
+            회원가입 없이 둘러보기
+          </button>
         </form>
         <p style={{ marginTop: '1.5rem', textAlign: 'center', color: 'var(--text-light)' }}>
           {isLogin ? '계정이 없나요? ' : '이미 계정이 있나요? '}

@@ -5,7 +5,7 @@ const apiKey = import.meta.env.VITE_GEMINI_API_KEY || '';
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
 export const generateStoryTurn = async (pageNumber, theme, protagonist, previousInput = '', grade = 'low', historyContext = '') => {
-  const TOTAL_TURNS = 15;
+  const TOTAL_TURNS = grade === 'low' ? 10 : 15;
   const isMock = !genAI || !apiKey || apiKey === 'your_gemini_api_key_here';
 
   // Fallback to mock if API key is missing
@@ -19,14 +19,14 @@ export const generateStoryTurn = async (pageNumber, theme, protagonist, previous
 
     // 기승전결 흐름 계산
     let narrativePhase = '';
-    if (pageNumber <= 3) {
-      narrativePhase = '발단(기): 이야기의 배경(학교, 동네, 숲 등 일상적인 공간)과 주인공의 현재 상황을 소개하며 이야기를 시작해.';
-    } else if (pageNumber <= 9) {
-      narrativePhase = '전개(승): 일상 속에서 일어나는 작은 문제, 친구(또는 가족)와의 갈등, 새로운 발견 등 공감할 수 있는 사건을 전개해.';
-    } else if (pageNumber <= 13) {
-      narrativePhase = '절정(전): 감정의 변화가 가장 크거나 문제가 절정에 달하는 사건이 발생해. 주인공이 스스로 생각하고 행동하게 만들어.';
+    if (pageNumber <= (grade === 'low' ? 2 : 3)) {
+      narrativePhase = '발단(기): 이야기의 배경과 주인공의 현재 상황을 소개하며 이야기를 흥미롭게 시작해.';
+    } else if (pageNumber <= (grade === 'low' ? 6 : 9)) {
+      narrativePhase = '전개(승): 평화로운 일상에 갑자기 예상치 못한 문제나 뚜렷한 위기(Crisis)가 발생해. 주인공이 곤경에 처하거나 갈등이 고조되는 사건을 만들어줘.';
+    } else if (pageNumber <= (grade === 'low' ? 8 : 13)) {
+      narrativePhase = '절정(전): 위기와 갈등이 최고조에 달하는 가장 긴장감 넘치는 순간이야! 주인공이 용기를 내어 문제를 정면으로 마주하고 해결책을 시도하게 만들어.';
     } else {
-      narrativePhase = '결말(결): 문제를 해결하거나 새로운 깨달음을 얻으며, 아이들의 일상이나 동물의 삶에 맞는 따뜻한 결말을 지어.';
+      narrativePhase = '결말(결): 문제를 완전히 해결하고, 큰 깨달음이나 감동을 얻으며 따뜻하고 여운이 남는 결말을 지어.';
     }
 
     const prompt = `
@@ -40,10 +40,11 @@ export const generateStoryTurn = async (pageNumber, theme, protagonist, previous
     ${historyContext || '이야기 첫 시작'}
 
     위 상황과 '현재 소설 흐름', 그리고 '이전 이야기 진행 상황'에 완벽히 맞춰 앞선 맥락과 이어지도록 이야기를 전개해줘. 특히 마지막 사용자의 행동에 대한 자연스러운 결과가 이어져야 해. 갑자기 맥락에 맞지 않는 뜬금없는 사건을 발생시키지 마.
+    단순한 일기장이나 평범한 나열식 이야기가 되지 않도록, 소설처럼 위기, 갈등, 해결이 명확한 기승전결 구조를 확실하게 보여줘.
     판타지나 무리한 모험보다는, 아이들이 실제로 겪을 만한 일상이나 동물이 겪을 만한 생활 이야기를 중심으로 공감할 수 있는 스토리를 만들어.
     
     [중요 규칙]
-    1. 어린이가 읽기 쉽게 2~3문장 정도로 짧게 작성해.
+    1. ${grade === 'low' ? '**[글자수 및 어휘 엄격 제한]** 반드시 딱 1~2문장(최대 50자 이내)으로 아주 짧고 단순하게 핵심만 말해. **8~10살(초등학교 1~3학년)이 쉽게 이해할 수 있는 아주 쉬운 일상 단어만 사용해.** (예: 관제탑, 설상가상, 고조되는 등 어려운 한자어 절대 금지). 불필요한 묘사는 모두 생략해.' : '어린이가 읽기 쉽게 2~3문장 정도로 간결하게 작성해.'}
     2. 이전 단계들과 비슷한 유형의 질문을 반복하지 마. (예: 맨날 장소만 묻지 말고, 감정을 묻거나, 도구 사용 방법을 묻거나, 친구에게 할 대사를 고르게 하는 등 매번 다른 유형의 질문을 던져)
     3. ${pageNumber === TOTAL_TURNS ? '마지막 15단계이므로 감동적인 결말을 완성하고, 선택지(options)와 질문(question)은 빈칸으로 반환해.' : '주인공이 다음으로 할 수 있는 행동 선택지 2개를 만들어줘.'}
     4. **절대 사용자의 선택을 직접 언급하지 마세요.** (예: "네가 ~를 선택했구나", "주인공이 ~하기로 결정했어" 금지) 마치 원래 한 권의 책이었던 것처럼, 이전 선택 행동을 매우 자연스럽게 다음 문장으로 이어서 묘사하세요. 챗봇이나 게임이라는 흔적을 절대 남기지 마세요.
@@ -53,6 +54,7 @@ export const generateStoryTurn = async (pageNumber, theme, protagonist, previous
       "storyText": "순수하게 동화책에 들어갈 이야기 본문 (선택했다는 언급 절대 금지, 자연스러운 소설 문장)",
       "question": "${pageNumber === TOTAL_TURNS ? '' : '아이에게 물어보는 1문장짜리 질문 (예: 이제 어떻게 할까?, 너라면 무슨 말을 할래?)'}",
       "options": ${pageNumber === TOTAL_TURNS ? '[]' : '["선택지1", "선택지2"]'},
+      "imagePromptEn": "A short English phrase describing the current scene visually for AI image generation, simple cute cartoon style (e.g. 'cute rabbit running in forest')",
       "isLastPage": ${pageNumber === TOTAL_TURNS}
     }
     `;
@@ -66,9 +68,9 @@ export const generateStoryTurn = async (pageNumber, theme, protagonist, previous
     
     const parsedData = JSON.parse(jsonMatch[1] || jsonMatch[0]);
     
-    // 1페이지에 한해 동적 이미지(삽화) 1장 삽입
-    if (pageNumber === 1) {
-      parsedData.image = `https://image.pollinations.ai/prompt/${encodeURIComponent(theme + ' ' + protagonist.type + ' fairy tale illustration cute colorful flat vector')}?width=800&height=500&nologo=true`;
+    // 첫 페이지에 한해 고품질 삽화 생성 (영문 프롬프트 활용)
+    if (pageNumber === 1 && parsedData.imagePromptEn) {
+      parsedData.image = `https://image.pollinations.ai/prompt/${encodeURIComponent(parsedData.imagePromptEn + ' cute kawaii children book illustration, 2d flat vector, simple pastel colors')}?width=800&height=500&nologo=true`;
     }
 
     return parsedData;
