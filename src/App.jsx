@@ -21,6 +21,7 @@ function App() {
   const [protagonist, setProtagonist] = useState(null);
   const [isTermsOpen, setIsTermsOpen] = useState(false);
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
+  const [guestStories, setGuestStories] = useState([]);
 
   useEffect(() => {
     // Check active session
@@ -55,8 +56,16 @@ function App() {
   const saveStoryToSupabase = async (storyData) => {
     const supabase = getSupabase();
     if (!supabase || user?.isGuest) {
-      alert(user?.isGuest ? '둘러보기 모드에서는 저장되지 않습니다.' : 'MOCK 모드입니다. 브라우저에 임시로 저장했다고 가정합니다!');
-      setStep(1);
+      const newStory = {
+        id: `guest-${Date.now()}`,
+        user_id: 'guest',
+        title: storyData.theme,
+        pages: storyData.pages,
+        created_at: new Date().toISOString()
+      };
+      setGuestStories(prev => [newStory, ...prev]);
+      alert('둘러보기 모드이므로 브라우저에 임시로 저장되었습니다! (새로고침 시 사라집니다)');
+      setStep(5);
       return;
     }
     try {
@@ -95,7 +104,7 @@ function App() {
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative' }}>
         {step === 0 && <Auth onLogin={handleLogin} />}
         {step === 1 && <Step0_5_EthicsGate onAgree={() => setStep(2)} />}
-        {step === 2 && <Step1_GradeSelect onSelect={(selectedGrade) => { setGrade(selectedGrade); setStep(3); }} />}
+        {step === 2 && <Step1_GradeSelect onSelect={(selectedGrade) => { setGrade(selectedGrade); setStep(3); }} onBack={() => setStep(1)} />}
         {step === 3 && (
           <Step2_ThemeSelect grade={grade} onSelect={(data) => { 
             if(typeof data === 'string') {
@@ -107,7 +116,7 @@ function App() {
               setProtagonist(data.protagonist);
             }
             setStep(4); 
-          }} />
+          }} onBack={() => setStep(2)} />
         )}
         
         {step === 4 && (
@@ -119,7 +128,7 @@ function App() {
             onSave={saveStoryToSupabase}
           />
         )}
-        {step === 5 && <Library user={user} onBack={() => setStep(2)} />}
+        {step === 5 && <Library user={user} onBack={() => setStep(2)} guestStories={guestStories} setGuestStories={setGuestStories} />}
       </main>
 
       <footer style={{ background: '#fcf4fb', padding: '2rem', borderTop: '1px solid #f6e6f5', textAlign: 'center', color: '#6a5a6a', fontSize: '0.95rem', marginTop: 'auto' }}>

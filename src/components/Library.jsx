@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getSupabase } from '../services/supabaseClient';
-import { Trash2, PlayCircle } from 'lucide-react';
+import { Trash2, PlayCircle, Edit3 } from 'lucide-react';
 
 const ImageWithLoading = ({ src, alt }) => {
   const [loaded, setLoaded] = useState(false);
@@ -75,11 +75,13 @@ const MOCK_STORIES = [
   }
 ];
 
-export default function Library({ user, onBack }) {
+export default function Library({ user, onBack, guestStories = [], setGuestStories }) {
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [selectedStory, setSelectedStory] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editFormData, setEditFormData] = useState(null);
 
   useEffect(() => {
     fetchStories();
@@ -89,7 +91,7 @@ export default function Library({ user, onBack }) {
     try {
       setLoading(true);
       if (user?.isGuest) {
-        setStories(MOCK_STORIES);
+        setStories([...guestStories, ...MOCK_STORIES]);
         return;
       }
       
@@ -120,8 +122,9 @@ export default function Library({ user, onBack }) {
     
     try {
       const supabase = getSupabase();
-      if (!supabase) {
+      if (!supabase || user?.isGuest) {
         setStories(prev => prev.filter(s => s.id !== id));
+        if (setGuestStories) setGuestStories(prev => prev.filter(s => s.id !== id));
         return;
       }
 
@@ -141,26 +144,74 @@ export default function Library({ user, onBack }) {
     }
   };
 
+  const handleEditClick = (e, story) => {
+    e.stopPropagation();
+    setSelectedStory(story);
+    setIsEditing(true);
+    setEditFormData({
+      title: story.title,
+      pages: story.pages ? JSON.parse(JSON.stringify(story.pages)) : []
+    });
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      const supabase = getSupabase();
+      if (!supabase || user?.isGuest) {
+        setStories(prev => prev.map(s => s.id === selectedStory.id ? { ...s, title: editFormData.title, pages: editFormData.pages } : s));
+        if (setGuestStories) setGuestStories(prev => prev.map(s => s.id === selectedStory.id ? { ...s, title: editFormData.title, pages: editFormData.pages } : s));
+        setIsEditing(false);
+        setSelectedStory(null);
+        alert('임시 저장되었습니다!');
+        return;
+      }
+      
+      const { error } = await supabase
+        .from('stories')
+        .update({ title: editFormData.title, pages: editFormData.pages })
+        .eq('id', selectedStory.id);
+        
+      if (error) throw error;
+      
+      setStories(prev => prev.map(s => s.id === selectedStory.id ? { ...s, title: editFormData.title, pages: editFormData.pages } : s));
+      setIsEditing(false);
+      setSelectedStory(null);
+      alert('수정 내용이 저장되었습니다!');
+    } catch (err) {
+      console.error('수정 오류:', err);
+      alert('수정에 실패했습니다.');
+    }
+  };
+
   return (
     <>
       {/* 동화 읽기 모달 */}
       {selectedStory && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }} onClick={() => setSelectedStory(null)}>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }} onClick={() => { if(!isEditing) setSelectedStory(null) }}>
           <div style={{ background: 'white', borderRadius: '24px', width: '100%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', padding: '3rem', position: 'relative' }} onClick={(e) => e.stopPropagation()}>
             <button 
-              onClick={() => setSelectedStory(null)} 
+              onClick={() => { setSelectedStory(null); setIsEditing(false); }} 
               style={{ position: 'absolute', top: '20px', right: '20px', background: '#eaeaea', border: 'none', borderRadius: '50%', width: '40px', height: '40px', cursor: 'pointer', fontSize: '1.2rem', fontWeight: 'bold' }}
             >
               ✕
             </button>
-            <h1 className="heading-font" style={{ fontSize: '2.5rem', color: 'var(--primary-color)', marginBottom: '1rem', textAlign: 'center' }}>{selectedStory.title}</h1>
+            
+            {isEditing ? (
+              <input 
+                value={editFormData.title} 
+                onChange={e => setEditFormData({...editFormData, title: e.target.value})}
+                style={{ fontSize: '2rem', width: '100%', border: '2px solid #74b9ff', borderRadius: '12px', padding: '0.8rem', marginBottom: '1rem', textAlign: 'center', fontFamily: 'inherit', fontWeight: 'bold', color: 'var(--primary-color)' }}
+              />
+            ) : (
+              <h1 className="heading-font" style={{ fontSize: '2.5rem', color: 'var(--primary-color)', marginBottom: '1rem', textAlign: 'center' }}>{selectedStory.title}</h1>
+            )}
+
             <p style={{ textAlign: 'center', color: 'var(--text-light)', marginBottom: '3rem' }}>{new Date(selectedStory.created_at).toLocaleDateString()} 생성됨</p>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', padding: '0 2rem' }}>
-              {selectedStory.pages?.map((page, idx) => {
-                // 이전 데이터 호환성을 위해 text 속성 폴백 지원
+              {(isEditing ? editFormData.pages : selectedStory.pages)?.map((page, idx) => {
                 const paragraphText = page.storyText || page.text;
-                if (!paragraphText) return null;
+                if (!paragraphText && !isEditing) return null;
                 
                 return (
                   <div key={idx} style={{ 
@@ -171,19 +222,46 @@ export default function Library({ user, onBack }) {
                     letterSpacing: '0.02em',
                     textIndent: '1rem'
                   }}>
-                    {page.image && (
+                    {page.image && !isEditing && (
                       <ImageWithLoading src={page.image} alt="삽화" />
                     )}
-                    <p style={{ margin: 0, wordBreak: 'keep-all' }}>{paragraphText}</p>
+                    {page.image && isEditing && (
+                      <img src={page.image} alt="삽화 썸네일" style={{ width: '150px', borderRadius: '8px', marginBottom: '1rem', opacity: 0.8 }} />
+                    )}
+                    
+                    {isEditing ? (
+                      <textarea 
+                        value={paragraphText}
+                        onChange={(e) => {
+                          const newPages = [...editFormData.pages];
+                          newPages[idx] = { ...newPages[idx], storyText: e.target.value, text: e.target.value };
+                          setEditFormData({ ...editFormData, pages: newPages });
+                        }}
+                        style={{ width: '100%', minHeight: '120px', fontSize: '1.2rem', padding: '1.2rem', borderRadius: '12px', border: '2px solid #ffe3e3', fontFamily: 'inherit', lineHeight: 1.8, background: '#fff0f6', resize: 'vertical' }}
+                      />
+                    ) : (
+                      <p style={{ margin: 0, wordBreak: 'keep-all' }}>{paragraphText}</p>
+                    )}
                   </div>
                 );
               })}
             </div>
             
-            <div style={{ textAlign: 'center', marginTop: '3rem' }}>
-              <button className="btn btn-primary" onClick={() => setSelectedStory(null)} style={{ borderRadius: '30px', padding: '1rem 3rem', fontSize: '1.2rem' }}>
-                다 읽었어요!
-              </button>
+            <div style={{ textAlign: 'center', marginTop: '3rem', display: 'flex', justifyContent: 'center', gap: '1rem' }}>
+              {isEditing ? (
+                <>
+                  <button className="btn" onClick={() => setIsEditing(false)} style={{ borderRadius: '30px', padding: '1rem 2.5rem', fontSize: '1.2rem', background: '#eaeaea' }}>
+                    수정 취소
+                  </button>
+                  <button className="btn btn-primary" onClick={handleSaveEdit} style={{ borderRadius: '30px', padding: '1rem 3.5rem', fontSize: '1.2rem' }}>
+                    저장하기
+                  </button>
+                </>
+              ) : (
+                <button className="btn btn-primary" onClick={() => setSelectedStory(null)} style={{ borderRadius: '30px', padding: '1rem 3rem', fontSize: '1.2rem' }}>
+                  다 읽었어요!
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -251,7 +329,27 @@ export default function Library({ user, onBack }) {
                   
                   <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #eaeaea', paddingTop: '1rem' }}>
                     <span style={{ fontSize: '0.9rem', color: 'var(--primary-color)', fontWeight: 'bold' }}>{story.pages?.length || 15} Turns</span>
-                    {!user?.isGuest && (
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <button 
+                        onClick={(e) => handleEditClick(e, story)}
+                        style={{ 
+                          background: '#e0f2fe', 
+                          color: '#0284c7', 
+                          border: 'none', 
+                          padding: '0.6rem', 
+                          borderRadius: '50%',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          transition: 'background 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = '#bae6fd'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = '#e0f2fe'}
+                        title="수정하기"
+                      >
+                        <Edit3 size={18} />
+                      </button>
                       <button 
                         onClick={(e) => handleDelete(e, story.id)}
                         style={{ 
@@ -272,7 +370,7 @@ export default function Library({ user, onBack }) {
                       >
                         <Trash2 size={18} />
                       </button>
-                    )}
+                    </div>
                   </div>
                 </div>
               </div>

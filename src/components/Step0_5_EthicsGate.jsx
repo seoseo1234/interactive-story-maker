@@ -58,7 +58,7 @@ export default function Step0_5_EthicsGate({ onAgree }) {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
           {guides.map((guide, idx) => (
-            <div key={idx} style={{ background: '#f8f9fa', padding: '1.2rem', borderRadius: '20px', border: '1px solid #eaeaea', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <div key={idx} style={{ background: '#fffcf0', padding: '1.2rem', borderRadius: '20px', border: '2px solid #ffec99', display: 'flex', flexDirection: 'column', gap: '0.5rem', boxShadow: '0 4px 10px rgba(255,236,153,0.2)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
                 <div style={{ background: 'white', padding: '0.5rem', borderRadius: '12px', boxShadow: 'var(--shadow-sm)' }}>
                   {React.cloneElement(guide.icon, { size: 24 })}
