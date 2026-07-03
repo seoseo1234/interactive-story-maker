@@ -4,7 +4,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY || '';
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
-export const generateStoryTurn = async (pageNumber, theme, protagonist, previousInput = '', grade = 'low') => {
+export const generateStoryTurn = async (pageNumber, theme, protagonist, previousInput = '', grade = 'low', historyContext = '') => {
   const TOTAL_TURNS = 15;
   const isMock = !genAI || !apiKey || apiKey === 'your_gemini_api_key_here';
 
@@ -15,7 +15,7 @@ export const generateStoryTurn = async (pageNumber, theme, protagonist, previous
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite" });
 
     // 기승전결 흐름 계산
     let narrativePhase = '';
@@ -35,9 +35,12 @@ export const generateStoryTurn = async (pageNumber, theme, protagonist, previous
     주인공 이름: ${protagonist.name} (캐릭터 특징: ${protagonist.type})
     현재 진행 단계: ${pageNumber} / ${TOTAL_TURNS}
     현재 소설 흐름: ${narrativePhase}
-    사용자의 이전 선택/입력: ${previousInput || '이야기 시작'}
+    
+    [이전 이야기 진행 상황]
+    ${historyContext || '이야기 첫 시작'}
 
-    위 상황과 '현재 소설 흐름'에 완벽히 맞춰 이야기를 진행해줘. 판타지나 무리한 모험보다는, 아이들이 실제로 겪을 만한 일상이나 동물이 겪을 만한 생활 이야기를 중심으로 공감할 수 있는 스토리를 만들어.
+    위 상황과 '현재 소설 흐름', 그리고 '이전 이야기 진행 상황'에 완벽히 맞춰 앞선 맥락과 이어지도록 이야기를 전개해줘. 특히 마지막 사용자의 행동에 대한 자연스러운 결과가 이어져야 해. 갑자기 맥락에 맞지 않는 뜬금없는 사건을 발생시키지 마.
+    판타지나 무리한 모험보다는, 아이들이 실제로 겪을 만한 일상이나 동물이 겪을 만한 생활 이야기를 중심으로 공감할 수 있는 스토리를 만들어.
     
     [중요 규칙]
     1. 어린이가 읽기 쉽게 2~3문장 정도로 짧게 작성해.
@@ -72,6 +75,14 @@ export const generateStoryTurn = async (pageNumber, theme, protagonist, previous
 
   } catch (err) {
     console.error("Gemini API 호출 에러:", err);
+    if (!isMock) {
+       return {
+          storyText: `(앗, AI 작가님이 잠시 멈췄어요. 상세 에러: ${err.message.substring(0, 50)}...) 잠시 후 다시 진행해주세요!`,
+          question: `다시 시도해볼까요?`,
+          options: [previousInput || '다시 시도'],
+          isLastPage: false
+       };
+    }
     return generateMockTurn(pageNumber, theme, protagonist, previousInput, grade, TOTAL_TURNS);
   }
 };

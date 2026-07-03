@@ -53,7 +53,12 @@ export default function Step3_StoryView({ grade, theme, protagonist, onFinish, o
     setLoading(true);
     setCurrentOptions([]);
     
-    const data = await generateStoryTurn(page, theme, protagonist, input, grade);
+    const historyContext = [...messages, { sender: 'user', text: input }]
+      .filter(m => m.text)
+      .map(m => `${m.sender === 'ai' ? '동화 내용' : '주인공 행동'}: ${m.text}`)
+      .join('\n');
+      
+    const data = await generateStoryTurn(page, theme, protagonist, input, grade, historyContext);
     
     const turnData = {
         storyText: data.storyText,
