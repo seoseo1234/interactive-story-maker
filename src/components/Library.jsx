@@ -21,6 +21,39 @@ const ImageWithLoading = ({ src, alt }) => {
   );
 };
 
+const MOCK_STORIES = [
+  {
+    id: 'mock1',
+    title: '바나나 먹고 배탈 난 원숭이',
+    created_at: new Date().toISOString(),
+    pages: [
+      { storyText: '옛날 옛적에 숲속 마을에 먹보 원숭이가 살았어요.', image: 'https://image.pollinations.ai/prompt/cute%20monkey%20eating%20banana%20fairy%20tale%20illustration?width=400&height=300&nologo=true' },
+      { storyText: '원숭이는 길을 가다가 엄청나게 큰 바나나 나무를 발견했어요. 너무 배가 고팠던 원숭이는 껍질째 와구와구 먹어버렸답니다.', image: 'https://image.pollinations.ai/prompt/giant%20banana%20tree%20fairy%20tale?width=400&height=300&nologo=true' },
+      { storyText: '결국 배탈이 나서 병원에 가야 했어요. 앞으로는 씻어서 꼭꼭 씹어 먹기로 다짐했답니다!', image: 'https://image.pollinations.ai/prompt/sick%20monkey%20in%20bed%20fairy%20tale?width=400&height=300&nologo=true' }
+    ]
+  },
+  {
+    id: 'mock2',
+    title: '비오는 날에 비행기 모는 이야기',
+    created_at: new Date(Date.now() - 86400000).toISOString(),
+    pages: [
+      { storyText: '비가 주룩주룩 내리는 날이었어요. 꼬마 비행기 윙윙이는 첫 비행을 앞두고 무서웠죠.', image: 'https://image.pollinations.ai/prompt/cute%20airplane%20in%20rain%20fairy%20tale?width=400&height=300&nologo=true' },
+      { storyText: '천둥 번개가 쳐서 겁이 났지만, 관제탑 아저씨의 따뜻한 응원을 듣고 용기를 냈어요.', image: 'https://image.pollinations.ai/prompt/airport%20control%20tower%20fairy%20tale?width=400&height=300&nologo=true' },
+      { storyText: '구름을 뚫고 올라가니 맑은 하늘과 예쁜 무지개가 윙윙이를 반겨주었답니다!', image: 'https://image.pollinations.ai/prompt/airplane%20over%20clouds%20with%20rainbow?width=400&height=300&nologo=true' }
+    ]
+  },
+  {
+    id: 'mock3',
+    title: '달나라 토끼의 특별한 우주선',
+    created_at: new Date(Date.now() - 172800000).toISOString(),
+    pages: [
+      { storyText: '달나라에는 떡을 아주 잘 찧는 토끼가 살고 있었어요.', image: 'https://image.pollinations.ai/prompt/moon%20rabbit%20pounding%20mochi%20fairy%20tale?width=400&height=300&nologo=true' },
+      { storyText: '어느 날 우주선이 고장 나 달에 불시착한 우주인 아저씨를 만났어요.', image: 'https://image.pollinations.ai/prompt/astronaut%20meeting%20rabbit%20on%20moon?width=400&height=300&nologo=true' },
+      { storyText: '토끼는 절구통으로 마법의 우주떡을 만들어 우주선의 연료통에 채워주었고, 아저씨는 무사히 지구로 돌아갔어요.', image: 'https://image.pollinations.ai/prompt/spaceship%20flying%20away%20from%20moon?width=400&height=300&nologo=true' }
+    ]
+  }
+];
+
 export default function Library({ user, onBack }) {
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,6 +67,11 @@ export default function Library({ user, onBack }) {
   const fetchStories = async () => {
     try {
       setLoading(true);
+      if (user?.isGuest) {
+        setStories(MOCK_STORIES);
+        return;
+      }
+      
       const supabase = getSupabase();
       if (!supabase) {
         setStories([]);
@@ -66,8 +104,13 @@ export default function Library({ user, onBack }) {
         return;
       }
 
-      const { error } = await supabase.from('stories').delete().eq('id', id);
+      const { data, error } = await supabase.from('stories').delete().eq('id', id).select();
       if (error) throw error;
+      
+      if (!data || data.length === 0) {
+        alert('삭제 권한이 없거나 설정이 필요합니다. (Supabase RLS 설정 확인)');
+        return;
+      }
       
       setStories(prev => prev.filter(s => s.id !== id));
       if (selectedStory?.id === id) setSelectedStory(null);
@@ -78,11 +121,10 @@ export default function Library({ user, onBack }) {
   };
 
   return (
-    <div className="container animate-fade-in" style={{ padding: '2rem 1rem' }}>
-      
+    <>
       {/* 동화 읽기 모달 */}
       {selectedStory && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }} onClick={() => setSelectedStory(null)}>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }} onClick={() => setSelectedStory(null)}>
           <div style={{ background: 'white', borderRadius: '24px', width: '100%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', padding: '3rem', position: 'relative' }} onClick={(e) => e.stopPropagation()}>
             <button 
               onClick={() => setSelectedStory(null)} 
@@ -126,10 +168,11 @@ export default function Library({ user, onBack }) {
         </div>
       )}
 
-      <div style={{ background: 'rgba(255,255,255,0.9)', padding: '2rem 3rem', borderRadius: '24px', backdropFilter: 'blur(10px)', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="container animate-fade-in" style={{ padding: '2rem 1rem' }}>
+        <div style={{ background: 'rgba(255,255,255,0.9)', padding: '2rem 3rem', borderRadius: '24px', backdropFilter: 'blur(10px)', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h1 className="title" style={{ margin: 0, textAlign: 'left', color: 'var(--primary-color)' }}>내 보관함 📚</h1>
-          <p style={{ color: 'var(--text-light)', marginTop: '0.5rem' }}>내가 만든 멋진 이야기들이 모여있어요!</p>
+          <h1 className="title" style={{ margin: 0, textAlign: 'left', color: 'var(--primary-color)' }}>{user?.isGuest ? '예시 작품 갤러리 📚' : '내 보관함 📚'}</h1>
+          <p style={{ color: 'var(--text-light)', marginTop: '0.5rem' }}>{user?.isGuest ? '다른 친구들이 만든 멋진 동화를 감상해보세요!' : '내가 만든 멋진 이야기들이 모여있어요!'}</p>
         </div>
         <button className="btn" onClick={onBack} style={{ borderRadius: '30px', padding: '0.8rem 2rem' }}>
           돌아가기
@@ -187,26 +230,28 @@ export default function Library({ user, onBack }) {
                   
                   <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #eaeaea', paddingTop: '1rem' }}>
                     <span style={{ fontSize: '0.9rem', color: 'var(--primary-color)', fontWeight: 'bold' }}>{story.pages?.length || 15} Turns</span>
-                    <button 
-                      onClick={(e) => handleDelete(e, story.id)}
-                      style={{ 
-                        background: '#fee2e2', 
-                        color: '#ef4444', 
-                        border: 'none', 
-                        padding: '0.6rem', 
-                        borderRadius: '50%',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        transition: 'background 0.2s'
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.background = '#fecaca'}
-                      onMouseLeave={(e) => e.currentTarget.style.background = '#fee2e2'}
-                      title="삭제"
-                    >
-                      <Trash2 size={18} />
-                    </button>
+                    {!user?.isGuest && (
+                      <button 
+                        onClick={(e) => handleDelete(e, story.id)}
+                        style={{ 
+                          background: '#fee2e2', 
+                          color: '#ef4444', 
+                          border: 'none', 
+                          padding: '0.6rem', 
+                          borderRadius: '50%',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          transition: 'background 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = '#fecaca'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = '#fee2e2'}
+                        title="삭제"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -214,6 +259,7 @@ export default function Library({ user, onBack }) {
           })}
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

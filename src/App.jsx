@@ -82,11 +82,9 @@ function App() {
         </div>
         {user && (
           <div style={{ display: 'flex', gap: '1rem' }}>
-            {!user.isGuest && (
-              <button className="btn" style={{ fontSize: '1rem', padding: '0.5rem 1rem', background: '#e9ecef', color: '#495057' }} onClick={() => setStep(5)}>
-                내 보관함 📚
-              </button>
-            )}
+            <button className="btn" style={{ fontSize: '1rem', padding: '0.5rem 1rem', background: '#e9ecef', color: '#495057' }} onClick={() => setStep(5)}>
+              {user.isGuest ? '예시 작품 보기 📚' : '내 보관함 📚'}
+            </button>
             <button className="btn" style={{ fontSize: '1rem', padding: '0.5rem 1rem', background: '#fff0f6', color: '#a61e4d' }} onClick={handleLogout}>
               {user.isGuest ? '둘러보기 종료' : '로그아웃'}
             </button>

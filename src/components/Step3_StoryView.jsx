@@ -44,6 +44,7 @@ export default function Step3_StoryView({ grade, theme, protagonist, onFinish, o
   const BAD_WORDS = ['바보', '멍청이', '씨발', '개새끼', '나쁜말', '병신', '지랄', '존나', '새끼', '미친', '죽어'];
 
   const chatEndRef = useRef(null);
+  const chatHistoryRef = useRef(null);
 
   // 주인공 데이터 방어코드
   const heroName = protagonist?.name || '주인공';
@@ -53,7 +54,12 @@ export default function Step3_StoryView({ grade, theme, protagonist, onFinish, o
   const avatarUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent('A cute kawaii ' + heroType + ' character, pastel colors, 2d flat vector art, white background')}?width=200&height=200&nologo=true`;
 
   const scrollToBottom = () => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (chatHistoryRef.current) {
+      chatHistoryRef.current.scrollTo({
+        top: chatHistoryRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
   };
 
   useEffect(() => {
@@ -208,12 +214,12 @@ export default function Step3_StoryView({ grade, theme, protagonist, onFinish, o
             </div>
           )}
 
-          <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center' }}>
-            <button className="btn btn-primary" style={{ padding: '1.2rem 3rem', fontSize: '1.5rem', borderRadius: '30px' }} onClick={() => onSave({ theme, pages: storyData })}>
-              <BookOpen size={24} style={{ marginRight: '8px' }} />
+          <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '1.2rem 3rem', fontSize: '1.5rem', borderRadius: '30px', whiteSpace: 'nowrap' }} onClick={() => onSave({ theme, pages: storyData })}>
+              <BookOpen size={24} />
               보관함에 자랑하기 💾
             </button>
-            <button className="btn" style={{ padding: '1.2rem 3rem', fontSize: '1.5rem', borderRadius: '30px', border: '2px solid #eaeaea' }} onClick={onFinish}>
+            <button className="btn" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '1.2rem 3rem', fontSize: '1.5rem', borderRadius: '30px', border: '2px solid #eaeaea', whiteSpace: 'nowrap' }} onClick={onFinish}>
               새로운 모험 떠나기 🚀
             </button>
           </div>
@@ -230,7 +236,7 @@ export default function Step3_StoryView({ grade, theme, protagonist, onFinish, o
         {/* Left Side: Chatbot UI */}
         <div style={{ flex: 2.5, display: 'flex', flexDirection: 'column' }}>
           <div className="chat-container" style={{ flex: 1, maxWidth: '100%', height: 'auto' }}>
-            <div className="chat-history">
+            <div className="chat-history" ref={chatHistoryRef}>
               {messages.map(msg => (
                 <div key={msg.id} className={`chat-bubble-wrapper ${msg.sender}`}>
                   <div className="chat-avatar" style={{ overflow: 'hidden' }}>
