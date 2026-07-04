@@ -70,7 +70,8 @@ export const generateStoryTurn = async (pageNumber, theme, protagonist, previous
     
     // 첫 페이지에 한해 고품질 삽화 생성 (영문 프롬프트 활용)
     if (pageNumber === 1 && parsedData.imagePromptEn) {
-      parsedData.image = `https://image.pollinations.ai/prompt/${encodeURIComponent(parsedData.imagePromptEn + ' cute kawaii children book illustration, 2d flat vector, simple pastel colors')}?width=800&height=500&nologo=true`;
+      const randomSeed = Math.floor(Math.random() * 1000000);
+      parsedData.image = `https://image.pollinations.ai/prompt/${encodeURIComponent(parsedData.imagePromptEn + ' cute kawaii children book illustration, 2d flat vector, simple pastel colors')}?width=800&height=500&nologo=true&seed=${randomSeed}`;
     }
 
     return parsedData;
@@ -100,7 +101,7 @@ const generateMockTurn = async (pageNumber, theme, protagonist, previousInput, g
       question: `어떻게 시작할까?`,
       options: ['주변을 두리번거리며 걷는다.', '콧노래를 부르며 신나게 뛰어간다.'],
       isLastPage: false,
-      image: `https://image.pollinations.ai/prompt/${encodeURIComponent(theme + ' ' + protagonist.type + ' fairy tale illustration cute colorful flat vector')}?width=800&height=500&nologo=true`
+      image: `https://image.pollinations.ai/prompt/${encodeURIComponent(theme + ' ' + protagonist.type + ' fairy tale illustration cute colorful flat vector')}?width=800&height=500&nologo=true&seed=${Math.floor(Math.random() * 1000000)}`
     };
   } else if (pageNumber === TOTAL_TURNS) {
     result = {

@@ -12,7 +12,7 @@ const ImageWithLoading = ({ src, alt }) => {
         </div>
       )}
       <img 
-        src={src} 
+        src={src ? src.replace('&model=flux-schnell', '') : src} 
         alt={alt} 
         onLoad={() => setLoaded(true)}
         style={{ width: '100%', display: 'block', opacity: loaded ? 1 : 0, transition: 'opacity 0.5s ease-in-out' }} 

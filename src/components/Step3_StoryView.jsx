@@ -19,7 +19,7 @@ const ImageWithLoading = ({ src, alt }) => {
         </div>
       )}
       <img 
-        src={src} 
+        src={src ? src.replace('&model=flux-schnell', '') : src} 
         alt={alt} 
         onLoad={() => setLoaded(true)}
         onError={() => { setLoaded(true); setError(true); }}
@@ -219,7 +219,8 @@ export default function Step3_StoryView({ grade, theme, protagonist, onFinish, o
   }
 
   if (isCompleted) {
-    const finalImage = storyData.find(d => d.isLastPage)?.image || storyData[0]?.image;
+    let finalImage = storyData.find(d => d.isLastPage)?.image || storyData[0]?.image;
+    if (finalImage) finalImage = finalImage.replace('&model=flux-schnell', '');
     
     return (
       <div className="container animate-fade-in" style={{ justifyContent: 'center', alignItems: 'center', textAlign: 'center', maxWidth: '800px' }}>
@@ -231,8 +232,8 @@ export default function Step3_StoryView({ grade, theme, protagonist, onFinish, o
           </p>
           
           {finalImage && (
-            <div style={{ padding: '10px', background: '#faf8f5', border: '3px solid #e8dfd5', borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', marginBottom: '3rem', display: 'inline-block' }}>
-              <img src={finalImage} alt="결말 이미지" style={{ width: '100%', maxWidth: '500px', borderRadius: '16px' }} onError={(e) => { e.currentTarget.parentElement.style.display = 'none'; }} />
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '3rem' }}>
+              <ImageWithLoading src={finalImage} alt="결말 이미지" />
             </div>
           )}
 
@@ -261,8 +262,8 @@ export default function Step3_StoryView({ grade, theme, protagonist, onFinish, o
             <div className="chat-history" ref={chatHistoryRef}>
               {messages.map(msg => (
                 <div key={msg.id} className={`chat-bubble-wrapper ${msg.sender}`}>
-                  <div className="chat-avatar" style={{ overflow: 'hidden' }}>
-                    {msg.sender === 'ai' ? '🤖' : <AvatarWithLoading src={avatarUrl} alt="주인공" />}
+                  <div className="chat-avatar" style={{ overflow: 'hidden', background: msg.sender === 'ai' ? 'transparent' : '#fef3c7', color: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {msg.sender === 'ai' ? <img src="/bot-avatar.png" alt="AI" style={{width: '100%', height: '100%', objectFit: 'cover', transform: 'scale(2.2) translateY(5%)', borderRadius: '50%', imageRendering: '-webkit-optimize-contrast'}} /> : <Star size={24} fill="#f59e0b" />}
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <div className={`chat-bubble ${msg.sender}`} style={{ fontSize: grade === 'low' ? 'var(--text-size-low)' : 'var(--text-size-high)' }}>
@@ -277,7 +278,7 @@ export default function Step3_StoryView({ grade, theme, protagonist, onFinish, o
               
               {loading && (
                 <div className="chat-bubble-wrapper ai">
-                  <div className="chat-avatar">🤖</div>
+                  <div className="chat-avatar" style={{ overflow: 'hidden', background: 'transparent' }}><img src="/bot-avatar.png" alt="AI" style={{width: '100%', height: '100%', objectFit: 'cover', transform: 'scale(2.2) translateY(5%)', borderRadius: '50%', imageRendering: '-webkit-optimize-contrast'}} /></div>
                   <div className="chat-bubble ai" style={{ display: 'flex', gap: '5px', alignItems: 'center', padding: '1.5rem' }}>
                     <span className="animate-pulse" style={{ width: '8px', height: '8px', background: '#94a3b8', borderRadius: '50%' }}></span>
                     <span className="animate-pulse" style={{ width: '8px', height: '8px', background: '#94a3b8', borderRadius: '50%', animationDelay: '0.2s' }}></span>
