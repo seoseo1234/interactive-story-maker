@@ -29,6 +29,28 @@ const ImageWithLoading = ({ src, alt }) => {
   );
 };
 
+const AvatarWithLoading = ({ src, alt }) => {
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState(false);
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '100%', background: '#f8f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      {!loaded && !error && (
+        <span className="animate-pulse" style={{ fontSize: '1.5rem', color: '#94a3b8' }}>✨</span>
+      )}
+      {error && (
+        <User size={32} color="#94a3b8" />
+      )}
+      <img 
+        src={src} 
+        alt={alt} 
+        onLoad={() => setLoaded(true)}
+        onError={() => { setLoaded(true); setError(true); }}
+        style={{ width: '100%', height: '100%', objectFit: 'cover', display: error ? 'none' : 'block', opacity: loaded ? 1 : 0, transition: 'opacity 0.5s ease-in-out', position: 'absolute', top: 0, left: 0 }} 
+      />
+    </div>
+  );
+};
+
 export default function Step3_StoryView({ grade, theme, protagonist, onFinish, onSave }) {
   const TOTAL_TURNS = grade === 'low' ? 10 : 15;
   const [currentPage, setCurrentPage] = useState(1);
@@ -240,7 +262,7 @@ export default function Step3_StoryView({ grade, theme, protagonist, onFinish, o
               {messages.map(msg => (
                 <div key={msg.id} className={`chat-bubble-wrapper ${msg.sender}`}>
                   <div className="chat-avatar" style={{ overflow: 'hidden' }}>
-                    {msg.sender === 'ai' ? '🤖' : <img src={avatarUrl} alt="주인공" style={{ width: '100%', height: '100%' }} />}
+                    {msg.sender === 'ai' ? '🤖' : <AvatarWithLoading src={avatarUrl} alt="주인공" />}
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <div className={`chat-bubble ${msg.sender}`} style={{ fontSize: grade === 'low' ? 'var(--text-size-low)' : 'var(--text-size-high)' }}>
@@ -319,7 +341,7 @@ export default function Step3_StoryView({ grade, theme, protagonist, onFinish, o
             </h3>
             
             <div style={{ width: '180px', height: '180px', borderRadius: '50%', overflow: 'hidden', border: '4px solid white', boxShadow: '0 10px 20px rgba(0,0,0,0.1)', marginBottom: '1.5rem' }}>
-              <img src={avatarUrl} alt="주인공 프로필" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <AvatarWithLoading src={avatarUrl} alt="주인공 프로필" />
             </div>
 
             <div style={{ textAlign: 'center', width: '100%' }}>
