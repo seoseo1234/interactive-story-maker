@@ -11,7 +11,7 @@ export default function MarkdownModal({ title, content, onClose }) {
       padding: '2rem'
     }}>
       <div className="animate-fade-in" onClick={(e) => e.stopPropagation()} style={{
-        background: 'white', borderRadius: '24px', width: '100%', maxWidth: '800px',
+        background: '#faf8f5', border: '3px solid #e8dfd5', borderRadius: '24px', width: '100%', maxWidth: '800px',
         maxHeight: '90vh', display: 'flex', flexDirection: 'column',
         boxShadow: '0 20px 50px rgba(0,0,0,0.2)'
       }}>

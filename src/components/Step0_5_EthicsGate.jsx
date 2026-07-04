@@ -45,7 +45,7 @@ export default function Step0_5_EthicsGate({ onAgree }) {
 
   return (
     <div className="container animate-fade-in" style={{ maxWidth: '1100px', padding: '1rem' }}>
-      <div style={{ background: 'rgba(255,255,255,0.95)', padding: '2rem', borderRadius: '32px', boxShadow: 'var(--shadow-lg)' }}>
+      <div style={{ background: 'rgba(250, 248, 245, 0.95)', border: '3px solid #e8dfd5', padding: '2rem', borderRadius: '32px', boxShadow: 'var(--shadow-lg)' }}>
         
         <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
           <ShieldCheck size={48} color="var(--primary-color)" style={{ marginBottom: '0.5rem' }} />
@@ -60,7 +60,7 @@ export default function Step0_5_EthicsGate({ onAgree }) {
           {guides.map((guide, idx) => (
             <div key={idx} style={{ background: '#fffcf0', padding: '1.2rem', borderRadius: '20px', border: '2px solid #ffec99', display: 'flex', flexDirection: 'column', gap: '0.5rem', boxShadow: '0 4px 10px rgba(255,236,153,0.2)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
-                <div style={{ background: 'white', padding: '0.5rem', borderRadius: '12px', boxShadow: 'var(--shadow-sm)' }}>
+                <div style={{ background: '#faf8f5', border: '3px solid #e8dfd5', padding: '0.5rem', borderRadius: '12px', boxShadow: 'var(--shadow-sm)' }}>
                   {React.cloneElement(guide.icon, { size: 24 })}
                 </div>
                 <h2 className="heading-font" style={{ fontSize: '1.3rem', color: '#333', margin: 0 }}>{guide.title}</h2>

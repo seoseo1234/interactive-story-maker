@@ -182,7 +182,7 @@ export default function Step3_StoryView({ grade, theme, protagonist, onFinish, o
   if (isLocked) {
     return (
       <div className="container animate-fade-in" style={{ justifyContent: 'center', alignItems: 'center', textAlign: 'center', maxWidth: '800px', minHeight: '85vh' }}>
-        <div style={{ background: 'rgba(255,255,255,0.95)', padding: '4rem 2rem', borderRadius: '32px', boxShadow: '0 20px 50px rgba(0,0,0,0.1)', width: '100%' }}>
+        <div style={{ background: 'rgba(250, 248, 245, 0.95)', border: '3px solid #e8dfd5', padding: '4rem 2rem', borderRadius: '32px', boxShadow: '0 20px 50px rgba(0,0,0,0.1)', width: '100%' }}>
           <h1 className="title" style={{ fontSize: '3rem', marginBottom: '1rem', color: '#ff6b6b' }}>🚨 잠깐만요! 🚨</h1>
           <p className="subtitle" style={{ fontSize: '1.5rem', marginBottom: '3rem', color: '#333' }}>
             나쁜 말이 감지되어 대화창이 잠겼습니다.<br/>
@@ -223,7 +223,7 @@ export default function Step3_StoryView({ grade, theme, protagonist, onFinish, o
     
     return (
       <div className="container animate-fade-in" style={{ justifyContent: 'center', alignItems: 'center', textAlign: 'center', maxWidth: '800px' }}>
-        <div style={{ background: 'rgba(255,255,255,0.95)', padding: '4rem 2rem', borderRadius: '32px', boxShadow: '0 20px 50px rgba(0,0,0,0.1)', width: '100%' }}>
+        <div style={{ background: 'rgba(250, 248, 245, 0.95)', border: '3px solid #e8dfd5', padding: '4rem 2rem', borderRadius: '32px', boxShadow: '0 20px 50px rgba(0,0,0,0.1)', width: '100%' }}>
           <Sparkles size={64} color="#f5a623" className="animate-fade-in" style={{ marginBottom: '1rem', animationDuration: '2s', animationIterationCount: 'infinite' }} />
           <h1 className="title" style={{ fontSize: '4rem', marginBottom: '1rem', color: '#f5a623', textShadow: '2px 2px 0px rgba(255,255,255,1)' }}>🎉 완성 축하! 🎉</h1>
           <p className="subtitle" style={{ fontSize: '1.6rem', marginBottom: '3rem', color: '#333' }}>
@@ -231,8 +231,8 @@ export default function Step3_StoryView({ grade, theme, protagonist, onFinish, o
           </p>
           
           {finalImage && (
-            <div style={{ padding: '10px', background: 'white', borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', marginBottom: '3rem', display: 'inline-block' }}>
-              <img src={finalImage} alt="결말 이미지" style={{ width: '100%', maxWidth: '500px', borderRadius: '16px' }} />
+            <div style={{ padding: '10px', background: '#faf8f5', border: '3px solid #e8dfd5', borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', marginBottom: '3rem', display: 'inline-block' }}>
+              <img src={finalImage} alt="결말 이미지" style={{ width: '100%', maxWidth: '500px', borderRadius: '16px' }} onError={(e) => { e.currentTarget.parentElement.style.display = 'none'; }} />
             </div>
           )}
 
@@ -324,7 +324,7 @@ export default function Step3_StoryView({ grade, theme, protagonist, onFinish, o
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           
           {/* Progress Card */}
-          <div style={{ background: 'rgba(255,255,255,0.95)', padding: '2rem', borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
+          <div style={{ background: 'rgba(250, 248, 245, 0.95)', border: '3px solid #e8dfd5', padding: '2rem', borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
               <span style={{ fontWeight: 'bold', color: 'var(--text-light)', fontSize: '1.2rem' }}>진행도</span>
               <span style={{ fontWeight: 'bold', color: 'var(--primary-color)', fontSize: '1.5rem' }}>{currentPage} / {TOTAL_TURNS}</span>
@@ -335,7 +335,7 @@ export default function Step3_StoryView({ grade, theme, protagonist, onFinish, o
           </div>
 
           {/* Character Card */}
-          <div style={{ background: 'rgba(255,255,255,0.95)', padding: '2rem', borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div style={{ background: 'rgba(250, 248, 245, 0.95)', border: '3px solid #e8dfd5', padding: '2rem', borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <h3 className="heading-font" style={{ fontSize: '1.8rem', color: '#333', marginBottom: '1.5rem', alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <User color="var(--primary-color)" /> 내 캐릭터
             </h3>

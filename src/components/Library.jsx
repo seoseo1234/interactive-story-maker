@@ -211,7 +211,7 @@ export default function Library({ user, onBack, guestStories = [], setGuestStori
       {/* 동화 읽기 모달 */}
       {selectedStory && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }} onClick={() => { if(!isEditing) setSelectedStory(null) }}>
-          <div style={{ background: 'white', borderRadius: '24px', width: '100%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', padding: '3rem', position: 'relative' }} onClick={(e) => e.stopPropagation()}>
+          <div style={{ background: '#faf8f5', border: '3px solid #e8dfd5', borderRadius: '24px', width: '100%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', padding: '3rem', position: 'relative' }} onClick={(e) => e.stopPropagation()}>
             <button 
               onClick={() => { setSelectedStory(null); setIsEditing(false); }} 
               style={{ position: 'absolute', top: '20px', right: '20px', background: '#eaeaea', border: 'none', borderRadius: '50%', width: '40px', height: '40px', cursor: 'pointer', fontSize: '1.2rem', fontWeight: 'bold' }}
@@ -291,7 +291,7 @@ export default function Library({ user, onBack, guestStories = [], setGuestStori
       )}
 
       <div className="container animate-fade-in" style={{ padding: '2rem 1rem' }}>
-        <div style={{ background: 'rgba(255,255,255,0.9)', padding: '2rem 3rem', borderRadius: '24px', backdropFilter: 'blur(10px)', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ background: 'rgba(250, 248, 245, 0.9)', border: '3px solid #e8dfd5', padding: '2rem 3rem', borderRadius: '24px', backdropFilter: 'blur(10px)', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h1 className="title" style={{ margin: 0, textAlign: 'left', color: 'var(--primary-color)' }}>{user?.isGuest ? '예시 작품 갤러리 📚' : '내 보관함 📚'}</h1>
           <p style={{ color: 'var(--text-light)', marginTop: '0.5rem' }}>{user?.isGuest ? '다른 친구들이 만든 멋진 동화를 감상해보세요!' : '내가 만든 멋진 이야기들이 모여있어요!'}</p>
@@ -302,11 +302,11 @@ export default function Library({ user, onBack, guestStories = [], setGuestStori
       </div>
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '5rem', background: 'rgba(255,255,255,0.8)', borderRadius: '24px' }}>
+        <div style={{ textAlign: 'center', padding: '5rem', background: '#faf8f5', border: '3px solid #e8dfd5', borderRadius: '24px' }}>
           <p style={{ fontSize: '1.2rem', color: 'var(--text-light)' }}>보관함을 여는 중입니다...</p>
         </div>
       ) : stories.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '5rem 2rem', background: 'rgba(255,255,255,0.9)', borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
+        <div style={{ textAlign: 'center', padding: '5rem 2rem', background: 'rgba(250, 248, 245, 0.9)', border: '3px solid #e8dfd5', borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
           <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>📭</div>
           <p style={{ fontSize: '1.4rem', color: 'var(--text-main)', marginBottom: '2rem' }}>아직 만든 동화가 없어요!</p>
           <button className="btn btn-primary" onClick={onBack} style={{ fontSize: '1.2rem', padding: '1rem 2.5rem', borderRadius: '30px' }}>
@@ -322,7 +322,7 @@ export default function Library({ user, onBack, guestStories = [], setGuestStori
               <div key={story.id} className="animate-fade-in" 
                 onClick={() => setSelectedStory(story)}
                 style={{ 
-                background: 'white', 
+                background: '#faf8f5', border: '3px solid #e8dfd5', 
                 borderRadius: '24px', 
                 overflow: 'hidden', 
                 boxShadow: '0 10px 20px rgba(0,0,0,0.06)',

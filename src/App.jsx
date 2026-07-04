@@ -84,7 +84,7 @@ function App() {
 
   return (
     <>
-      <header style={{ background: 'white', padding: '1rem 2rem', borderBottom: '1px solid #eaeaea', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(8px)' }}>
+      <header style={{ background: '#faf8f5', border: '3px solid #e8dfd5', padding: '1rem 2rem', borderBottom: '1px solid #eaeaea', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(8px)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer' }} onClick={() => user ? (step > 1 ? setStep(2) : setStep(1)) : setStep(0)}>
           <img src="/icon.png" alt="App Icon" style={{ width: '40px', height: '40px', borderRadius: '8px' }} />
           <h1 className="heading-font" style={{ margin: 0, fontSize: '1.8rem', color: 'var(--text-main)' }}>인터렉티브 스토리 제작소</h1>

@@ -6,7 +6,7 @@ export default function Step1_GradeSelect({ onSelect, onBack }) {
       {onBack && (
         <button 
           onClick={onBack}
-          style={{ position: 'absolute', top: '1rem', left: '1rem', background: 'white', border: '1px solid #eaeaea', borderRadius: '20px', padding: '0.6rem 1.2rem', fontSize: '1rem', cursor: 'pointer', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}
+          style={{ position: 'absolute', top: '1rem', left: '1rem', background: '#faf8f5', border: '3px solid #e8dfd5', border: '1px solid #eaeaea', borderRadius: '20px', padding: '0.6rem 1.2rem', fontSize: '1rem', cursor: 'pointer', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}
         >
           ⬅️ 뒤로가기
         </button>

@@ -22,12 +22,12 @@ export default function Step2_ThemeSelect({ grade, onSelect, onBack }) {
       {onBack && (
         <button 
           onClick={onBack}
-          style={{ position: 'absolute', top: '1.5rem', left: '1.5rem', background: 'white', border: '1px solid #eaeaea', borderRadius: '20px', padding: '0.6rem 1.2rem', fontSize: '1rem', cursor: 'pointer', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', zIndex: 10 }}
+          style={{ position: 'absolute', top: '1.5rem', left: '1.5rem', background: '#faf8f5', border: '3px solid #e8dfd5', border: '1px solid #eaeaea', borderRadius: '20px', padding: '0.6rem 1.2rem', fontSize: '1rem', cursor: 'pointer', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', zIndex: 10 }}
         >
           ⬅️ 뒤로가기
         </button>
       )}
-      <div style={{ background: 'rgba(255,255,255,0.9)', padding: '2rem 3rem', borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
+      <div style={{ background: 'rgba(250, 248, 245, 0.9)', border: '3px solid #e8dfd5', padding: '2rem 3rem', borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
         <h1 className="title" style={{ color: 'var(--primary-color)', marginBottom: '0.5rem', fontSize: '2.2rem' }}>모험을 준비해볼까요?</h1>
         <p className="subtitle" style={{ marginBottom: '2rem', fontSize: '1.1rem' }}>주인공과 이야기 주제를 정해주세요!</p>
 

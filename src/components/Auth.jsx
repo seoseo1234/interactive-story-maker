@@ -34,7 +34,7 @@ export default function Auth({ onLogin }) {
 
   return (
     <div className="container animate-fade-in" style={{ justifyContent: 'center', alignItems: 'center' }}>
-      <div style={{ background: 'white', padding: '3rem', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-md)', width: '100%', maxWidth: '400px' }}>
+      <div style={{ background: '#faf8f5', border: '3px solid #e8dfd5', padding: '3rem', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-md)', width: '100%', maxWidth: '400px' }}>
         <h2 className="title" style={{ fontSize: '2.5rem', marginBottom: '1.5rem' }}>
           {isLogin ? '로그인' : '회원가입'}
         </h2>
