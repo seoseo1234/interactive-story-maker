@@ -1,16 +1,46 @@
-# React + Vite
+# 🎯 인터랙티브 스토리 제작소 최종 산출물 제출
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+## 📘 개요
+**인터랙티브 스토리 제작소** 최종 산출물 완성본. 
+본 프로젝트는 초등학생(저학년/고학년) 대상 맞춤형 AI 기반 창작 웹앱으로, 학생이 직접 주제와 캐릭터를 정하고 매 순간의 선택지를 고르며 **나만의 동화를 완성해가는 상호작용형(Interactive) 스토리텔링 포털**입니다.
 
-Currently, two official plugins are available:
+## ✅ 조건 충족 사항
+- 📄 제시된 최종 산출물 조건 모두 반영
+- 🔒 사용자 데이터 관리를 위한 정책 및 환경 구성
+- 🏫 소속학교 및 제작자 이름 표기 완료
+- 💻 GitHub 레포지토리 및 배포 주소 제공
+- 🔧 Supabase 백엔드 연동 및 생성된 동화 클라우드 보관함(저장/조회) 기능 구현
+- 🌐 프론트엔드 배포 URL 정상 작동 확인
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-## React Compiler
+## ℹ️ 기본 정보
+| 항목 | 내용 |
+|---|---|
+| **프로젝트명** | 인터랙티브 스토리 제작소 (Interactive Story Maker) |
+| **목적** | 학생 주도형 AI 인터랙티브 동화 창작 웹앱 제작 |
+| **대상** | 초등학생(저/고학년 수준별 맞춤) 및 창작에 관심 있는 모든 학생 |
+| **개발자** | 잠O초 윤OO |
+| **소속** | 서울잠동초등학 |
+| **배포 주소** | (https://interactive-story-maker-blush.vercel.app/) |
+| **GitHub 레포지토리** | [https://github.com/seoseo1234/interactive-story-maker] |
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🔄 개발 과정
+- 🏗️ 웹앱 구조 설계 및 UI/UX 제작 (React + Vite)
+- 📚 학년별(저학년 10턴/고학년 15턴) 수준을 고려한 세밀한 프롬프트 엔지니어링 및 Gemini AI 연동
+- 🎨 Pollinations AI를 활용한 실시간 맞춤형 삽화 및 캐릭터 프로필 이미지 생성 기능 구현
+- 🔒 사용자 스토리 데이터 저장을 위한 Supabase 백엔드 연동 (동화 보관함 기능)
+- 💻 GitHub 레포지토리에 업로드 및 버전 관리
+- 🚀 Vercel을 통해 최종 배포
 
-## Expanding the Oxlint configuration
+## 📖 사용 방법
+1. 사이트에 접속합니다.
+2. 학생의 학년(초저/초고)을 선택하여 글밥과 어휘 수준을 설정합니다.
+3. 만들고 싶은 동화의 주제를 자유롭게 입력하고 주인공 이름과 캐릭터를 선택합니다.
+4. AI가 들려주는 이야기를 읽고, 매 턴마다 제시되는 선택지 중 하나를 골라 나만의 이야기를 전개합니다.
+5. 나의 선택에 맞춰 실시간으로 그려지는 예쁜 AI 삽화를 감상하며 이야기에 몰입합니다.
+6. 10~15단계의 모험이 끝나면 '보관함에 자랑하기' 버튼을 눌러 내가 만든 동화를 저장하고 언제든 다시 읽어볼 수 있습니다.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## 🌟 프로젝트 의의
+이 웹앱은 학생들이 단순히 동화를 읽는 수동적인 독자에서 벗어나, AI와 상호작용하며 직접 이야기를 이끌어가는 **능동적인 창작자**가 될 수 있도록 돕습니다. 학년별 수준에 맞춘 텍스트와 실시간으로 생성되는 다채로운 파스텔톤의 삽화는 학생들의 상상력과 창의력을 크게 자극합니다. 동화책에 흥미가 없는 아이들이 자신이 주도적으로 동화를 제작하는 경험을 함으로써 독서에대한 흥미를 가질 수 있도록 하였습니다. 
+
+또한 위기-절정-결말로 이어지는 서사 속에서 스스로 선택지를 고르는 과정을 통해 원인과 결과를 이해하고 문제 해결 능력을 기를 수 있습니다. 추후에는 학생들이 객관식 선택지가 아닌 직접 행동을 타이핑하여 입력하거나, 완성된 동화를 친구들과 공유하고 좋아요를 누를 수 있는 소셜(Social) 및 게이미피케이션 요소를 더하여 고도화할 예정에 있습니다.
