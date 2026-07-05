@@ -20,7 +20,7 @@
 | **목적** | 학생 주도형 AI 인터랙티브 동화 창작 웹앱 제작 |
 | **대상** | 초등학생(저/고학년 수준별 맞춤) 및 창작에 관심 있는 모든 학생 |
 | **개발자** | 잠O초 윤OO |
-| **소속** | 서울잠동초등학 |
+| **소속** | 서울잠O초등학교 |
 | **배포 주소** | (https://interactive-story-maker-blush.vercel.app/) |
 | **GitHub 레포지토리** | [https://github.com/seoseo1234/interactive-story-maker] |
 
