@@ -138,7 +138,7 @@ export default function BookViewer({ story, onClose }) {
         return (
           <div className="page-content story" style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '2rem', background: '#fffdf9', boxSizing: 'border-box' }}>
             {page.image && <ImageWithLoading src={page.image} alt="동화 삽화" />}
-            <div style={{ flex: 1, overflowY: 'auto', fontFamily: "'Jua', sans-serif", fontSize: '1.4rem', lineHeight: 1.8, color: '#444', wordBreak: 'keep-all', paddingTop: '1rem' }}>
+            <div style={{ flex: 1, overflow: 'hidden', transform: 'translateZ(1px)', backfaceVisibility: 'hidden', fontFamily: "'Jua', sans-serif", fontSize: '1.4rem', lineHeight: 1.8, color: '#444', wordBreak: 'keep-all', paddingTop: '1rem' }}>
               {page.text}
             </div>
           </div>

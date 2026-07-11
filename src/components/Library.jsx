@@ -48,7 +48,7 @@ const CardImageWithLoading = ({ src, alt }) => {
 const MOCK_STORIES = [
   {
     id: 'mock1',
-    title: '비오는 날에 비행기 모는 이야기',
+    title: '구름 위를 둥둥, 꼬마 조종사 윙이',
     created_at: new Date(Date.now() - 100000).toISOString(),
     pages: [
       { storyText: '비가 주룩주룩 내리는 날이었어요. 꼬마 비행기 윙윙이는 첫 비행을 앞두고 활주로에 서 있었죠.', image: 'https://image.pollinations.ai/prompt/cute%20airplane%20in%20rain%20fairy%20tale?width=400&height=300&nologo=true' },
@@ -65,7 +65,7 @@ const MOCK_STORIES = [
   },
   {
     id: 'mock2',
-    title: '바나나 먹고 배탈 난 원숭이',
+    title: '원숭이 몽이의 꿀꺽꿀꺽 바나나',
     created_at: new Date(Date.now() - 86400000).toISOString(),
     pages: [
       { storyText: '옛날 옛적에 숲속 마을에 덜렁대는 원숭이 몽이가 살았어요. 몽이는 달콤한 과일 냄새를 따라 걷고 있었죠.', image: 'https://image.pollinations.ai/prompt/cute%20monkey%20eating%20banana%20fairy%20tale%20illustration?width=400&height=300&nologo=true' },
@@ -82,7 +82,7 @@ const MOCK_STORIES = [
   },
   {
     id: 'mock3',
-    title: '달나라 토끼의 특별한 우주선',
+    title: '달빛 향기 가득한 신비한 절구통',
     created_at: new Date(Date.now() - 172800000).toISOString(),
     pages: [
       { storyText: '달나라에는 절구통을 무척 아끼는 토끼 달콩이가 살고 있었어요.', image: 'https://image.pollinations.ai/prompt/moon%20rabbit%20pounding%20mochi%20fairy%20tale?width=400&height=300&nologo=true' },

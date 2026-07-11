@@ -46,16 +46,16 @@ export const generateStoryTurn = async (pageNumber, theme, protagonist, previous
     [중요 규칙]
     1. ${grade === 'low' ? '**[글자수 및 어휘 엄격 제한]** 반드시 딱 1~2문장(최대 50자 이내)으로 아주 짧고 단순하게 핵심만 말해. **8~10살(초등학교 1~3학년)이 쉽게 이해할 수 있는 아주 쉬운 일상 단어만 사용해.** (예: 관제탑, 설상가상, 고조되는 등 어려운 한자어 절대 금지). 불필요한 묘사는 모두 생략해.' : '**[글자수 제한]** 아이들이 읽다 지루해하지 않도록 2~3문장(최대 100자 이내)으로 간결하게 핵심만 말해. 쓸데없이 길고 복잡한 묘사는 생략해.'}
     2. 이전 단계들과 비슷한 유형의 질문을 반복하지 마. (예: 맨날 장소만 묻지 말고, 감정을 묻거나, 도구 사용 방법을 묻거나, 친구에게 할 대사를 고르게 하는 등 매번 다른 유형의 질문을 던져)
-    3. ${pageNumber === TOTAL_TURNS ? '마지막 15단계이므로 감동적인 결말을 완성하고, 선택지(options)와 질문(question)은 빈칸으로 반환해.' : '주인공이 다음으로 할 수 있는 행동 선택지 2개를 만들어줘.'}
+    3. ${pageNumber === TOTAL_TURNS ? '마지막 15단계이니 감동적인 결말을 완성하고, 선택지(options)나 질문(question)은 빈칸으로 반환해. 그리고 전체 이야기 내용과 잘 어울리는 실제 동화책 같은 멋진 제목을 지어줘. (예: "~하는 이야기" 같은 설명식 제목 금지. 은유적이고 예쁜 동화책 제목으로 만들 것)' : '주인공이 다음으로 할 수 있는 행동 선택지 2개를 만들어줘.'}
     4. **절대 사용자의 선택을 직접 언급하지 마세요.** (예: "네가 ~를 선택했구나", "주인공이 ~하기로 결정했어" 금지) 마치 원래 한 권의 책이었던 것처럼, 이전 선택 행동을 매우 자연스럽게 다음 문장으로 이어서 묘사하세요. 챗봇이나 게임이라는 흔적을 절대 남기지 마세요.
     
     반드시 아래 JSON 형식으로만 응답해:
     {
       "storyText": "순수하게 동화책에 들어갈 이야기 본문 (선택했다는 언급 절대 금지, 자연스러운 소설 문장)",
-      "question": "${pageNumber === TOTAL_TURNS ? '' : '아이에게 물어보는 1문장짜리 질문 (예: 이제 어떻게 할까?, 너라면 무슨 말을 할래?)'}",
+      "question": "${pageNumber === TOTAL_TURNS ? '' : '아이에게 물어보는 1문장짜리 질문 (예: 이제 어떻게 할까?, 토끼에게 무슨 말을 할래?)'}",
       "options": ${pageNumber === TOTAL_TURNS ? '[]' : '["선택지1", "선택지2"]'},
       "imagePromptEn": "A short English phrase describing the current scene visually for AI image generation, simple cute cartoon style (e.g. 'cute rabbit running in forest')",
-      "isLastPage": ${pageNumber === TOTAL_TURNS}
+      "isLastPage": ${pageNumber === TOTAL_TURNS}${pageNumber === TOTAL_TURNS ? ',\n      "title": "실제 동화책 같은 은유적이고 멋진 제목 (예: ~하는 이야기 절대 금지)"' : ''}
     }
     `;
 

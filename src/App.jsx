@@ -55,11 +55,14 @@ function App() {
 
   const saveStoryToSupabase = async (storyData) => {
     const supabase = getSupabase();
+    const generatedTitle = storyData.pages[storyData.pages.length - 1]?.title;
+    const finalTitle = generatedTitle ? generatedTitle : storyData.theme;
+
     if (!supabase || user?.isGuest) {
       const newStory = {
         id: `guest-${Date.now()}`,
         user_id: 'guest',
-        title: storyData.theme,
+        title: finalTitle,
         pages: storyData.pages,
         created_at: new Date().toISOString()
       };
@@ -71,7 +74,7 @@ function App() {
     try {
       const { error } = await supabase.from('stories').insert({
         user_id: user.id,
-        title: storyData.theme,
+        title: finalTitle,
         pages: storyData.pages
       });
       if (error) throw error;
