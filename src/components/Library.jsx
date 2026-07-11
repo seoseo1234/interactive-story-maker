@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getSupabase } from '../services/supabaseClient';
-import { Trash2, PlayCircle, Edit3 } from 'lucide-react';
+import { Trash2, PlayCircle, Edit3, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const ImageWithLoading = ({ src, alt }) => {
   const [loaded, setLoaded] = useState(false);
@@ -105,6 +105,7 @@ export default function Library({ user, onBack, guestStories = [], setGuestStori
   const [selectedStory, setSelectedStory] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editFormData, setEditFormData] = useState(null);
+  const [currentPage, setCurrentPage] = useState(0);
 
   useEffect(() => {
     fetchStories();
@@ -160,7 +161,7 @@ export default function Library({ user, onBack, guestStories = [], setGuestStori
       }
       
       setStories(prev => prev.filter(s => s.id !== id));
-      if (selectedStory?.id === id) setSelectedStory(null);
+      if (selectedStory?.id === id) { setSelectedStory(null); setCurrentPage(0); }
     } catch (err) {
       console.error('삭제 오류:', err);
       alert('삭제에 실패했습니다.');
@@ -185,6 +186,7 @@ export default function Library({ user, onBack, guestStories = [], setGuestStori
         if (setGuestStories) setGuestStories(prev => prev.map(s => s.id === selectedStory.id ? { ...s, title: editFormData.title, pages: editFormData.pages } : s));
         setIsEditing(false);
         setSelectedStory(null);
+        setCurrentPage(0);
         alert('임시 저장되었습니다!');
         return;
       }
@@ -199,6 +201,7 @@ export default function Library({ user, onBack, guestStories = [], setGuestStori
       setStories(prev => prev.map(s => s.id === selectedStory.id ? { ...s, title: editFormData.title, pages: editFormData.pages } : s));
       setIsEditing(false);
       setSelectedStory(null);
+      setCurrentPage(0);
       alert('수정 내용이 저장되었습니다!');
     } catch (err) {
       console.error('수정 오류:', err);
@@ -210,10 +213,10 @@ export default function Library({ user, onBack, guestStories = [], setGuestStori
     <>
       {/* 동화 읽기 모달 */}
       {selectedStory && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }} onClick={() => { if(!isEditing) setSelectedStory(null) }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }} onClick={() => { if(!isEditing) { setSelectedStory(null); setCurrentPage(0); } }}>
           <div style={{ background: '#faf8f5', border: '3px solid #e8dfd5', borderRadius: '24px', width: '100%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', padding: '3rem', position: 'relative' }} onClick={(e) => e.stopPropagation()}>
             <button 
-              onClick={() => { setSelectedStory(null); setIsEditing(false); }} 
+              onClick={() => { setSelectedStory(null); setIsEditing(false); setCurrentPage(0); }} 
               style={{ position: 'absolute', top: '20px', right: '20px', background: '#eaeaea', border: 'none', borderRadius: '50%', width: '40px', height: '40px', cursor: 'pointer', fontSize: '1.2rem', fontWeight: 'bold' }}
             >
               ✕
@@ -229,30 +232,25 @@ export default function Library({ user, onBack, guestStories = [], setGuestStori
               <h1 className="heading-font" style={{ fontSize: '2.5rem', color: 'var(--primary-color)', marginBottom: '1rem', textAlign: 'center' }}>{selectedStory.title}</h1>
             )}
 
-            <p style={{ textAlign: 'center', color: 'var(--text-light)', marginBottom: '3rem' }}>{new Date(selectedStory.created_at).toLocaleDateString()} 생성됨</p>
+            {!isEditing && <p style={{ textAlign: 'center', color: 'var(--text-light)', marginBottom: '3rem' }}>{new Date(selectedStory.created_at).toLocaleDateString()} 생성됨</p>}
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', padding: '0 2rem' }}>
-              {(isEditing ? editFormData.pages : selectedStory.pages)?.map((page, idx) => {
-                const paragraphText = page.storyText || page.text;
-                if (!paragraphText && !isEditing) return null;
-                
-                return (
-                  <div key={idx} style={{ 
-                    fontSize: '1.25rem', 
-                    lineHeight: 1.8, 
-                    color: 'var(--text-main)', 
-                    fontFamily: "'Gowun Dodum', sans-serif",
-                    letterSpacing: '0.02em',
-                    textIndent: '1rem'
-                  }}>
-                    {page.image && !isEditing && (
-                      <ImageWithLoading src={page.image} alt="삽화" />
-                    )}
-                    {page.image && isEditing && (
-                      <img src={page.image} alt="삽화 썸네일" style={{ width: '150px', borderRadius: '8px', marginBottom: '1rem', opacity: 0.8 }} />
-                    )}
-                    
-                    {isEditing ? (
+              {isEditing ? (
+                editFormData.pages?.map((page, idx) => {
+                  const paragraphText = page.storyText || page.text;
+                  if (!paragraphText) return null;
+                  return (
+                    <div key={idx} style={{ 
+                      fontSize: '1.25rem', 
+                      lineHeight: 1.8, 
+                      color: 'var(--text-main)', 
+                      fontFamily: "'Gowun Dodum', sans-serif",
+                      letterSpacing: '0.02em',
+                      textIndent: '1rem'
+                    }}>
+                      {page.image && (
+                        <img src={page.image} alt="삽화 썸네일" style={{ width: '150px', borderRadius: '8px', marginBottom: '1rem', opacity: 0.8 }} />
+                      )}
                       <textarea 
                         value={paragraphText}
                         onChange={(e) => {
@@ -262,12 +260,61 @@ export default function Library({ user, onBack, guestStories = [], setGuestStori
                         }}
                         style={{ width: '100%', minHeight: '120px', fontSize: '1.2rem', padding: '1.2rem', borderRadius: '12px', border: '2px solid #ffe3e3', fontFamily: 'inherit', lineHeight: 1.8, background: '#fff0f6', resize: 'vertical' }}
                       />
-                    ) : (
-                      <p style={{ margin: 0, wordBreak: 'keep-all' }}>{paragraphText}</p>
+                    </div>
+                  );
+                })
+              ) : (
+                <div style={{ position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '400px' }}>
+                  {/* Previous Page Trigger */}
+                  {currentPage > 0 && (
+                    <div 
+                      onClick={(e) => { e.stopPropagation(); setCurrentPage(p => p - 1); }}
+                      style={{ position: 'absolute', top: 0, left: '-2rem', bottom: 0, width: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', zIndex: 10 }}
+                    >
+                      <button style={{ background: 'rgba(255,255,255,0.8)', border: 'none', borderRadius: '50%', padding: '10px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', cursor: 'pointer', transform: 'translateX(-50%)' }}>
+                        <ChevronLeft size={32} color="var(--primary-color)" />
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Next Page Trigger */}
+                  {currentPage < (selectedStory.pages?.length || 0) - 1 && (
+                    <div 
+                      onClick={(e) => { e.stopPropagation(); setCurrentPage(p => p + 1); }}
+                      style={{ position: 'absolute', top: 0, right: '-2rem', bottom: 0, width: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', zIndex: 10 }}
+                    >
+                      <button style={{ background: 'rgba(255,255,255,0.8)', border: 'none', borderRadius: '50%', padding: '10px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', cursor: 'pointer', transform: 'translateX(50%)' }}>
+                        <ChevronRight size={32} color="var(--primary-color)" />
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="animate-fade-in" key={currentPage} style={{ width: '100%', textAlign: 'center' }}>
+                    {selectedStory.pages[currentPage]?.image && (
+                      <ImageWithLoading src={selectedStory.pages[currentPage].image} alt="삽화" />
                     )}
+                    <div style={{ 
+                      fontSize: '1.4rem', 
+                      lineHeight: 1.8, 
+                      color: 'var(--text-main)', 
+                      fontFamily: "'Gowun Dodum', sans-serif",
+                      letterSpacing: '0.02em',
+                      wordBreak: 'keep-all',
+                      padding: '1rem 3rem',
+                      background: 'rgba(255,255,255,0.5)',
+                      borderRadius: '16px',
+                      marginTop: '1rem'
+                    }}>
+                      {selectedStory.pages[currentPage]?.storyText || selectedStory.pages[currentPage]?.text}
+                    </div>
                   </div>
-                );
-              })}
+
+                  {/* Page Indicator */}
+                  <div style={{ marginTop: '2rem', color: '#aaa', fontSize: '1.1rem', fontFamily: "'Gowun Dodum', sans-serif" }}>
+                    - {currentPage + 1} / {selectedStory.pages?.length} -
+                  </div>
+                </div>
+              )}
             </div>
             
             <div style={{ textAlign: 'center', marginTop: '3rem', display: 'flex', justifyContent: 'center', gap: '1rem' }}>
