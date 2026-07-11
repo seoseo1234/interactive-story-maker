@@ -46,9 +46,7 @@ const ImageWithLoading = ({ src, alt, isCover }) => {
       borderRadius: '12px',
       overflow: 'hidden',
       marginBottom: '1rem',
-      boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.05)',
-      transform: 'translateZ(1px)',
-      backfaceVisibility: 'hidden'
+      boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.05)'
     }}>
       {!loaded && (
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -59,7 +57,7 @@ const ImageWithLoading = ({ src, alt, isCover }) => {
         src={src ? src.replace('&model=flux-schnell', '') : src} 
         alt={alt} 
         onLoad={() => setLoaded(true)}
-        style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: loaded ? 1 : 0, transition: 'opacity 0.5s ease-in-out' }} 
+        style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: loaded ? 1 : 0 }} 
       />
     </div>
   );
@@ -129,8 +127,8 @@ export default function BookViewer({ story, onClose }) {
     switch (page.type) {
       case 'cover':
         return (
-          <div className="page-content cover" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '2rem', background: '#faf8f5', border: '12px solid #e8dfd5', boxSizing: 'border-box', transform: 'translateZ(1px)', backfaceVisibility: 'hidden' }}>
-            <h1 style={{ fontFamily: "'Jua', sans-serif", fontSize: '2.8rem', color: '#ff6b6b', textAlign: 'center', marginBottom: '2rem', lineHeight: 1.3, textShadow: '2px 2px 0px #fff, 4px 4px 0px rgba(0,0,0,0.1)', wordBreak: 'keep-all', transform: 'translateZ(1px)', backfaceVisibility: 'hidden' }}>
+          <div className="page-content cover" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '2rem', background: '#faf8f5', border: '12px solid #e8dfd5', boxSizing: 'border-box' }}>
+            <h1 style={{ fontFamily: "'Jua', sans-serif", fontSize: '2.8rem', color: '#ff6b6b', textAlign: 'center', marginBottom: '2rem', lineHeight: 1.3, textShadow: '2px 2px 0px #fff, 4px 4px 0px rgba(0,0,0,0.1)', wordBreak: 'keep-all' }}>
               {page.title}
             </h1>
             {page.image && <ImageWithLoading src={page.image} alt="표지 삽화" isCover={true} />}
@@ -138,17 +136,17 @@ export default function BookViewer({ story, onClose }) {
         );
       case 'content':
         return (
-          <div className="page-content story" style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '2rem', background: '#fffdf9', boxSizing: 'border-box', transform: 'translateZ(1px)', backfaceVisibility: 'hidden' }}>
+          <div className="page-content story" style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '2rem', background: '#fffdf9', boxSizing: 'border-box' }}>
             {page.image && <ImageWithLoading src={page.image} alt="동화 삽화" />}
-            <div style={{ flex: 1, overflow: 'hidden', transform: 'translateZ(1px)', backfaceVisibility: 'hidden', fontFamily: "'Jua', sans-serif", fontSize: '1.4rem', lineHeight: 1.8, color: '#444', wordBreak: 'keep-all', paddingTop: '1rem' }}>
+            <div style={{ flex: 1, overflow: 'hidden', fontFamily: "'Jua', sans-serif", fontSize: '1.4rem', lineHeight: 1.8, color: '#444', wordBreak: 'keep-all', paddingTop: '1rem' }}>
               {page.text}
             </div>
           </div>
         );
       case 'end':
         return (
-          <div className="page-content end" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '2rem', background: '#faf8f5', boxSizing: 'border-box', transform: 'translateZ(1px)', backfaceVisibility: 'hidden' }}>
-            <h1 style={{ fontFamily: "'Jua', sans-serif", fontSize: '4rem', color: '#ccc', letterSpacing: '0.5rem', transform: 'translateZ(1px)', backfaceVisibility: 'hidden' }}>-끝-</h1>
+          <div className="page-content end" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '2rem', background: '#faf8f5', boxSizing: 'border-box' }}>
+            <h1 style={{ fontFamily: "'Jua', sans-serif", fontSize: '4rem', color: '#ccc', letterSpacing: '0.5rem' }}>-끝-</h1>
           </div>
         );
       default:
@@ -213,7 +211,8 @@ export default function BookViewer({ story, onClose }) {
                 zIndex,
                 transform: isFlipped ? 'rotateY(-180deg)' : 'rotateY(0deg)',
                 cursor: 'pointer',
-                boxShadow: isFlipped ? '5px 5px 20px rgba(0,0,0,0.1)' : '-5px 5px 20px rgba(0,0,0,0.1)'
+                boxShadow: isFlipped ? '5px 5px 20px rgba(0,0,0,0.1)' : '-5px 5px 20px rgba(0,0,0,0.1)',
+                willChange: 'transform'
               }}
               onClick={() => {
                 if (isFlipped) flipPrev();
